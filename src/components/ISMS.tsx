@@ -1,105 +1,225 @@
 import api from "@/api";
-import { Button, Input } from "@nextui-org/react";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { Button, Input, Table } from "@nextui-org/react";
+import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
+
 import React, { useState } from "react";
 import YTSummary from "./YTSummary";
-import BarChart from '../components/BarChart';
-import { ChartData } from 'chart.js';
+import BarChart from "../components/BarChart";
+import { ChartData } from "chart.js";
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
   const [isButtonLoading, setButtonLoading] = useState(false);
-  const [videoSummary, setVideoSummary] = useState({});
-  const [chartData, setChartData] = useState<ChartData<"bar", number[], string>>({
-    labels: ['Positive', 'Neutral', 'Negative', 'Unknown'],
+  const [videoSummary, setVideoSummary] = useState();
+  const [sentimentSummary, setSentimentSummary] = useState();
+  const [sentimentComments, setSentimentComments] = useState();
+  const [chartData, setChartData] = useState<
+    ChartData<"bar", number[], string>
+  >({
+    labels: ["Positive", "Neutral", "Negative", "Unknown"],
     datasets: [
       {
-        label: 'Comments',
+        label: "Comments",
         data: [], // Data will be populated from API
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
         ],
         borderWidth: 1,
       },
     ],
   });
+  const fallbackSentimentComments: any = [
+    {
+      comment: "Difference between positive and negative sentiments ?",
+      commentId: "UgyCFev6W64FhwYubh94AaABAg",
+      published_time: "2024-03-02T09:42:00Z",
+      sentiment: "Neutral",
+      updated_time: "2024-03-02T09:42:00Z",
+      user_name: "@SuccessIsAJourneyNotADes-dd5oz",
+    },
+   
+  ];
 
   const handleOnChange = (event: {
     target: { value: React.SetStateAction<string> };
   }) => {
     setYtURL(event.target.value);
+    setChartData({
+      labels: ["Positive", "Neutral", "Negative", "Unknown"],
+      datasets: [
+        {
+          label: "Comments",
+          data: [], // Data will be populated from API
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(255, 206, 86, 0.2)",
+            "rgba(75, 192, 192, 0.2)",
+            "rgba(153, 102, 255, 0.2)",
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    });
+    setVideoSummary(null);
+    setSentimentComments(null);
   };
   const clear = () => {
     setYtURL("");
+    setVideoSummary(null);
+    setSentimentSummary(null);
+  };
+
+  const updateVideoSummary = async () => {
+    const payload = {
+      url: ytURL, // Assuming ytURL is the YouTube URL input by the user
+    };
+
+    try {
+      // Attempt to fetch video summary from the API
+      const response: any = await api.post("/get_video_summary", payload);
+      console.log("Video summary response:", response.data);
+      setVideoSummary(response.data); // Assuming the API response structure matches your state
+      await api.post("/youtube_comment_extract", payload);
+    } catch (err: any) {
+      console.error("Error fetching video summary:", err);
+      // Log detailed error for debugging
+      if (err.response) {
+        console.log(err.response.data);
+        console.log(err.response.status);
+        console.log(err.response.headers);
+      } else if (err.request) {
+        console.log(err.request);
+      } else {
+        console.log("Error", err.message);
+      }
+      // Fallback to hardcoded data on error
+      // setVideoSummary({
+      //   channel_name: "Success Is A Journey Not A Destination",
+      //   subscriber_count: 10,
+      //   total_comments: 60,
+      //   video_duration: "2 Minute 15 Second",
+      //   video_likes: 7,
+      //   video_thumbnail: "https://i.ytimg.com/vi/f5YdhPYsk3U/default.jpg",
+      //   video_title: "YouTube comments Sentimental Analysis using ChatGPT",
+      //   video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
+      //   video_views: 68,
+      // });
+    }
+  };
+
+  const updateChartData = async () => {
+    const payload = {
+      url: ytURL, // Or a specific URL if needed
+    };
+
+    try {
+      const apiResponse: any = await api.post(
+        "/get_sentiment_analysis",
+        payload
+      );
+
+      console.log("apiResponse==>", apiResponse);
+      // Assuming apiResponse.data contains the necessary data
+      const {
+        positive_comments,
+        neutral_comments,
+        negative_comments,
+        unknown_comments,
+      } = apiResponse.data;
+
+      setSentimentSummary(apiResponse.data);
+
+      setChartData((prevState) => ({
+        ...prevState,
+        datasets: prevState.datasets.map((dataset) => ({
+          ...dataset,
+          data: [
+            // total_comments,
+            positive_comments,
+            neutral_comments,
+            negative_comments,
+            unknown_comments,
+          ],
+        })),
+      }));
+    } catch (err) {
+      console.error("Error fetching chart data:", err);
+      // Use hardcoded values as a fallback
+      setChartData((prevState) => ({
+        ...prevState,
+        datasets: prevState.datasets.map((dataset) => ({
+          ...dataset,
+          data: [33, 5, 28, 0, 0],
+        })),
+      }));
+    }
+  };
+
+  const fetchAllSentimentAnalysisData = async () => {
+    const payload = {
+      url: ytURL, // Or a specific URL if needed
+    };
+    try {
+      // Assuming `api` is your configured Axios instance
+      const response: any = await api.post(
+        "/fetch_all_sentiment_analysis_data",
+        payload
+      );
+      setSentimentComments(response.data);
+      console.log("Fetching sentiment analysis data failed: ", response);
+    } catch (error) {
+      console.error("Fetching sentiment analysis data failed: ", error);
+      // Fallback to local data if API call fails
+      setSentimentComments(fallbackSentimentComments);
+    }
   };
 
   const handleSubmit = async () => {
     setButtonLoading(true);
-    console.log("YTURL===>", ytURL);
-    const payload = {
-      url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-    };
-    try {
-    
-      const response = await api.post("/get_video_summary", payload);
-      console.log("response==>", response);
-      //@ts-ignore
-      setVideoSummary(response);
-    } catch (err) {
-      console.log("err===>", err);
-      setVideoSummary({
-        channel_name: "Success Is A Journey Not A Destination",
-        subsciber_count: 10,
-        total_comments: 60,
-        video_duration: "  2 Minute  15 Second",
-        video_likes: 7,
-        video_thumbnail: "https://i.ytimg.com/vi/f5YdhPYsk3U/default.jpg",
-        video_title: "YouTube comments Sentimental Analysis using ChatGPT",
-        video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-        video_views: 68,
-      });
-      const apiResponse = {
-        video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-        total_comments: 33,
-        negative_comments: 0,
-        neutral_comments: 28,
-        positive_comments: 5,
-        unknown_comments: 0,
-      };
-      setChartData(prevState => ({
-        ...prevState,
-        datasets: prevState.datasets.map(dataset => ({
-          ...dataset,
-          data: [
-            // apiResponse.total_comments,
-            apiResponse.positive_comments,
-            apiResponse.neutral_comments,
-            apiResponse.negative_comments,
-            apiResponse.unknown_comments,
-          ],
-        })),
-      }));
-    }
+    await updateVideoSummary();
     setButtonLoading(false);
-
-    // console.log("response==>", response)
   };
   console.log("videoSummary===>", videoSummary);
+  const handleSentimentAnalysis = async (key) => {
+    if (key === "Sentiment" && !sentimentSummary) {
+      await updateChartData();
+      await fetchAllSentimentAnalysisData();
+    }
+
+    // await fetchAllSentimentAnalysisData();
+  };
 
   return (
     <>
-      {GetYtURLComponent(handleOnChange, clear, isButtonLoading, handleSubmit, videoSummary,chartData)}
+      {GetYtURLComponent(
+        handleOnChange,
+        clear,
+        isButtonLoading,
+        handleSubmit,
+        videoSummary,
+        chartData,
+        sentimentComments,
+        handleSentimentAnalysis
+      )}
     </>
   );
 };
@@ -112,7 +232,9 @@ function GetYtURLComponent(
   isButtonLoading: boolean,
   handleSubmit: () => Promise<void>,
   videoSummary: any,
-  chartData:any
+  chartData: any,
+  sentimentComments: any,
+  handleSentimentAnalysis: any
 ) {
   return (
     <>
@@ -151,24 +273,51 @@ function GetYtURLComponent(
       >
         Submit
       </Button>
-      <Tabs size={"lg"} fullWidth={true} aria-label="Options">
+      <Tabs
+        onSelectionChange={handleSentimentAnalysis}
+        size={"lg"}
+        fullWidth={true}
+        aria-label="Options"
+      >
         <Tab key="Summary" title="Summary">
           {/* <Card>
             <CardBody>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </CardBody>
           </Card>   */}
-          <YTSummary videoSummary = {videoSummary} />
+          {videoSummary && <YTSummary videoSummary={videoSummary} />}
         </Tab>
         <Tab key="Sentiment" title="Sentiment Analysis">
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-2xl font-bold">YouTube Comments Sentiment Analysis</h1>
-        <div className="w-full max-w-4xl mt-6">
-          <BarChart chartData={chartData} />
-        </div>
-      </main>
-    </div>
+          <div className="flex flex-col items-center justify-center min-h-screen py-2">
+            <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+              <h1 className="text-2xl font-bold">
+                YouTube Comments Sentiment Analysis
+              </h1>
+              <div className="w-full max-w-4xl mt-6">
+                <BarChart chartData={chartData} />
+              </div>
+              <div className="flex flex-col items-center justify-center py-2">
+                <div className="w-full max-w-4xl mt-6">
+                  <Chip>Comments</Chip>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {sentimentComments?.map((comment: any, index: any) => (
+                      <Card key={index}>
+                        <CardBody>
+                          <p>
+                            Published:{" "}
+                            {new Date(comment.published_time).toLocaleString()}
+                          </p>
+                          <p>{comment.comment}</p>
+                          <p>Sentiment: {comment.sentiment}</p>
+                          <p>User: {comment.user_name}</p>
+                        </CardBody>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
         </Tab>
         <Tab key="Comment" title="Comment classifications">
           <Card>
