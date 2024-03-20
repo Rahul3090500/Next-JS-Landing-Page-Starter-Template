@@ -509,9 +509,9 @@ function GetYtURLComponent(
     return acc;
   }, []);
 
-  function handleBirthYearChange(e) {
+  function handleBirthYearChange(e, name) {
 
-    console.log("name==>", e)
+    console.log("name==>", e, name)
     const newValue = e.target.value;
     setRows((prevItems) => {
       return prevItems.map((item) => {
@@ -520,6 +520,8 @@ function GetYtURLComponent(
       });
     });
   }
+
+ 
 
   console.log("disabledKeys==>", newDisabledKeys);
   return (
@@ -530,6 +532,35 @@ function GetYtURLComponent(
         onSubmit={handleSubmit}
         buttonText="Save"
       />
+       <Table 
+      aria-label="Controlled table example with dynamic content"
+      selectionMode="multiple"
+      disabledKeys={newDisabledKeys}
+      selectedKeys={selectedKeys}
+      onSelectionChange={setSelectedKeys}
+    >
+      <TableHeader columns={columns}>
+        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+      </TableHeader>
+      <TableBody items={rows}>
+        {(item) => (
+          <TableRow key={item.commentId}>
+          {(columnKey) => 
+            columnKey === 'Response' ? 
+            <TableCell>
+              <input 
+                type="text" 
+                value={getKeyValue(item, columnKey)} 
+                onChange={(e) => handleBirthYearChange(e, item.commentId)} 
+              />
+            </TableCell> 
+            : 
+            <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+          }
+        </TableRow>
+        )}
+      </TableBody>
+    </Table>
       <Tabs
         onSelectionChange={handleSentimentAnalysis}
         size={"lg"}
