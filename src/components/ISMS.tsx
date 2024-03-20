@@ -12,6 +12,8 @@ const ISMS = () => {
   const [isButtonLoading, setButtonLoading] = useState(false);
   const [videoSummary, setVideoSummary] = useState();
   const [sentimentSummary, setSentimentSummary] = useState();
+  const [commentClassificatios, setCommentClassifications] = useState();
+  const [classifiactionComments, setClassificationComments] = useState()
   const [sentimentComments, setSentimentComments] = useState();
   const [chartData, setChartData] = useState<
     ChartData<"bar", number[], string>
@@ -19,7 +21,41 @@ const ISMS = () => {
     labels: ["Positive", "Neutral", "Negative", "Unknown"],
     datasets: [
       {
-        label: "Comments",
+        label: "comments",
+        data: [], // Data will be populated from API
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  });
+
+  const [classificationChartData, setclassificationChartData] = useState<
+    ChartData<"bar", number[], string>
+  >({
+    // labels: ["Positive", "Neutral", "Negative", "Unknown"],
+    labels: [
+      "Declarative",
+      "Exlamative",
+      "Imperative",
+      "Interagotive",
+      "Unknown",
+    ],
+    datasets: [
+      {
+        label: "classifiactions",
         data: [], // Data will be populated from API
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)",
@@ -48,7 +84,6 @@ const ISMS = () => {
       updated_time: "2024-03-02T09:42:00Z",
       user_name: "@SuccessIsAJourneyNotADes-dd5oz",
     },
-   
   ];
 
   const handleOnChange = (event: {
@@ -81,6 +116,7 @@ const ISMS = () => {
     });
     setVideoSummary(null);
     setSentimentComments(null);
+    setCommentClassifications(null);
   };
   const clear = () => {
     setYtURL("");
@@ -126,7 +162,7 @@ const ISMS = () => {
     }
   };
 
-  const updateChartData = async () => {
+  const updateSentimentChartData = async () => {
     const payload = {
       url: ytURL, // Or a specific URL if needed
     };
@@ -174,6 +210,55 @@ const ISMS = () => {
     }
   };
 
+  const updateCommentClassificationsChartData = async () => {
+    const payload = {
+      url: ytURL, // Or a specific URL if needed
+    };
+
+    try {
+      const apiResponse: any = await api.post(
+        "/get_sentencetype_advanced",
+        payload
+      );
+
+      console.log("apiResponse==>", apiResponse);
+      // Assuming apiResponse.data contains the necessary data
+      const {
+        Declarative_comments,
+        Exclamative_comments,
+        Imperative_comments,
+        Interrogative_comments,
+        unknown_comments,
+      } = apiResponse.data;
+
+      setCommentClassifications(apiResponse.data);
+
+      setclassificationChartData((prevState) => ({
+        ...prevState,
+        datasets: prevState.datasets.map((dataset) => ({
+          ...dataset,
+          data: [
+            Declarative_comments,
+            Exclamative_comments,
+            Imperative_comments,
+            Interrogative_comments,
+            unknown_comments,
+          ],
+        })),
+      }));
+    } catch (err) {
+      console.error("Error fetching chart data:", err);
+      // Use hardcoded values as a fallback
+      setChartData((prevState) => ({
+        ...prevState,
+        datasets: prevState.datasets.map((dataset) => ({
+          ...dataset,
+          data: [33, 5, 28, 0, 0],
+        })),
+      }));
+    }
+  };
+
   const fetchAllSentimentAnalysisData = async () => {
     const payload = {
       url: ytURL, // Or a specific URL if needed
@@ -193,16 +278,85 @@ const ISMS = () => {
     }
   };
 
+  const fetchAllCommentClassificationsData = async () => {
+    const payload = {
+      url: ytURL, // Or a specific URL if needed
+    };
+    try {
+      // Assuming `api` is your configured Axios instance
+      const response: any = await api.post(
+        "/fetch_all_sentencetype_data_advanced",
+        payload
+      );
+      setClassificationComments(response.data);
+      console.log("Fetching sentiment analysis data failed: ", response);
+    } catch (error) {
+      console.error("Fetching sentiment analysis data failed: ", error);
+      // Fallback to local data if API call fails
+      setClassificationComments(fallbackSentimentComments);
+    }
+  };
+
   const handleSubmit = async () => {
     setButtonLoading(true);
     await updateVideoSummary();
     setButtonLoading(false);
   };
   console.log("videoSummary===>", videoSummary);
-  const handleSentimentAnalysis = async (key) => {
-    if (key === "Sentiment" && !sentimentSummary) {
-      await updateChartData();
-      await fetchAllSentimentAnalysisData();
+  const handleSentimentAnalysis = async (key: String) => {
+    if (key === "Sentiment") {
+      if (sentimentSummary) {
+        const {
+          positive_comments,
+          neutral_comments,
+          negative_comments,
+          unknown_comments,
+        } = sentimentSummary;
+
+        setChartData((prevState) => ({
+          ...prevState,
+          datasets: prevState.datasets.map((dataset) => ({
+            ...dataset,
+            data: [
+              // total_comments,
+              positive_comments,
+              neutral_comments,
+              negative_comments,
+              unknown_comments,
+            ],
+          })),
+        }));
+      } else {
+        await updateSentimentChartData();
+        await fetchAllSentimentAnalysisData();
+      }
+    } else if (key === "Comment") {
+      if (commentClassificatios) {
+        const {
+          Declarative_comments,
+          Exclamative_comments,
+          Imperative_comments,
+          Interrogative_comments,
+          unknown_comments,
+        } = commentClassificatios;
+
+        setclassificationChartData((prevState) => ({
+          ...prevState,
+          datasets: prevState.datasets.map((dataset) => ({
+            ...dataset,
+            data: [
+              Declarative_comments,
+              Exclamative_comments,
+              Imperative_comments,
+              Interrogative_comments,
+              unknown_comments,
+            ],
+          })),
+        }));
+      } else {
+        await updateCommentClassificationsChartData();
+        await fetchAllCommentClassificationsData();
+      }
     }
 
     // await fetchAllSentimentAnalysisData();
@@ -218,7 +372,9 @@ const ISMS = () => {
         videoSummary,
         chartData,
         sentimentComments,
-        handleSentimentAnalysis
+        handleSentimentAnalysis,
+        classificationChartData,
+        classifiactionComments
       )}
     </>
   );
@@ -234,7 +390,9 @@ function GetYtURLComponent(
   videoSummary: any,
   chartData: any,
   sentimentComments: any,
-  handleSentimentAnalysis: any
+  handleSentimentAnalysis: any,
+  classificationChartData: any,
+  classifiactionComments: any
 ) {
   return (
     <>
@@ -320,12 +478,36 @@ function GetYtURLComponent(
           </div>
         </Tab>
         <Tab key="Comment" title="Comment classifications">
-          <Card>
-            <CardBody>
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-              officia deserunt mollit anim id est laborum.
-            </CardBody>
-          </Card>
+          <div className="flex flex-col items-center justify-center min-h-screen py-2">
+            <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+              <h1 className="text-2xl font-bold">
+                YouTube Comments Sentiment Analysis
+              </h1>
+              <div className="w-full max-w-4xl mt-6">
+                <BarChart chartData={classificationChartData} />
+              </div>
+              <div className="flex flex-col items-center justify-center py-2">
+                <div className="w-full max-w-4xl mt-6">
+                  <Chip>Comments</Chip>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {classifiactionComments?.map((comment: any, index: any) => (
+                      <Card key={index}>
+                        <CardBody>
+                          <p>
+                            Published:{" "}
+                            {new Date(comment.published_time).toLocaleString()}
+                          </p>
+                          <p>{comment.comment}</p>
+                          <p>Sentiment: {comment.sentiment}</p>
+                          <p>User: {comment.user_name}</p>
+                        </CardBody>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
         </Tab>
       </Tabs>
     </>
