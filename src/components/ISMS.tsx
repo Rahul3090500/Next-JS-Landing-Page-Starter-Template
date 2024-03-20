@@ -3,9 +3,13 @@ import { Button, Input } from "@nextui-org/react";
 import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
 
 import React, { useState } from "react";
-import YTSummary from "./YTSummary";
-import BarChart from "../components/BarChart";
+import YTSummary from "./ISMS/YTSummary";
+import BarChart from "./ISMS/BarChart";
 import { ChartData } from "chart.js";
+import YTURLInput from "./ISMS/YTURLInput";
+import SubmitButton from "./ISMS/SubmitButton";
+import SentimentTab from "./ISMS/SentimentTab";
+import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
@@ -13,7 +17,7 @@ const ISMS = () => {
   const [videoSummary, setVideoSummary] = useState();
   const [sentimentSummary, setSentimentSummary] = useState();
   const [commentClassificatios, setCommentClassifications] = useState();
-  const [classifiactionComments, setClassificationComments] = useState()
+  const [classificationComments, setClassificationComments] = useState()
   const [sentimentComments, setSentimentComments] = useState();
   const [chartData, setChartData] = useState<
     ChartData<"bar", number[], string>
@@ -75,16 +79,6 @@ const ISMS = () => {
       },
     ],
   });
-  const fallbackSentimentComments: any = [
-    {
-      comment: "Difference between positive and negative sentiments ?",
-      commentId: "UgyCFev6W64FhwYubh94AaABAg",
-      published_time: "2024-03-02T09:42:00Z",
-      sentiment: "Neutral",
-      updated_time: "2024-03-02T09:42:00Z",
-      user_name: "@SuccessIsAJourneyNotADes-dd5oz",
-    },
-  ];
 
   const handleOnChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -150,18 +144,6 @@ const ISMS = () => {
       } else {
         console.log("Error", err.message);
       }
-      // Fallback to hardcoded data on error
-      // setVideoSummary({
-      //   channel_name: "Success Is A Journey Not A Destination",
-      //   subscriber_count: 10,
-      //   total_comments: 60,
-      //   video_duration: "2 Minute 15 Second",
-      //   video_likes: 7,
-      //   video_thumbnail: "https://i.ytimg.com/vi/f5YdhPYsk3U/default.jpg",
-      //   video_title: "YouTube comments Sentimental Analysis using ChatGPT",
-      //   video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-      //   video_views: 68,
-      // });
     }
   };
 
@@ -207,7 +189,7 @@ const ISMS = () => {
         ...prevState,
         datasets: prevState.datasets.map((dataset) => ({
           ...dataset,
-          data: [33, 5, 28, 0, 0],
+          data: [],
         })),
       }));
     }
@@ -256,7 +238,7 @@ const ISMS = () => {
         ...prevState,
         datasets: prevState.datasets.map((dataset) => ({
           ...dataset,
-          data: [33, 5, 28, 0, 0],
+          data: [],
         })),
       }));
     }
@@ -277,7 +259,6 @@ const ISMS = () => {
     } catch (error) {
       console.error("Fetching sentiment analysis data failed: ", error);
       // Fallback to local data if API call fails
-      setSentimentComments(fallbackSentimentComments);
     }
   };
 
@@ -296,7 +277,6 @@ const ISMS = () => {
     } catch (error) {
       console.error("Fetching sentiment analysis data failed: ", error);
       // Fallback to local data if API call fails
-      setClassificationComments(fallbackSentimentComments);
     }
   };
 
@@ -377,7 +357,7 @@ const ISMS = () => {
         sentimentComments,
         handleSentimentAnalysis,
         classificationChartData,
-        classifiactionComments
+        classificationComments
       )}
     </>
   );
@@ -395,45 +375,16 @@ function GetYtURLComponent(
   sentimentComments: any,
   handleSentimentAnalysis: any,
   classificationChartData: any,
-  classifiactionComments: any
+  classificationComments: any
 ) {
   return (
     <>
-      <Input
-        onChange={handleOnChange}
-        onClear={clear}
-        type="url"
-        label="Youtube URL"
-      />
-      <Button
+      <YTURLInput onChange={handleOnChange} onClear={clear} />
+      <SubmitButton
         isLoading={isButtonLoading}
-        color="secondary"
-        onPressEnd={handleSubmit}
-        spinner={
-          <svg
-            className="animate-spin h-5 w-5 text-current"
-            fill="none"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              fill="currentColor"
-            />
-          </svg>
-        }
-      >
-        Submit
-      </Button>
+        onSubmit={handleSubmit}
+        buttonText="Save"
+      />
       <Tabs
         onSelectionChange={handleSentimentAnalysis}
         size={"lg"}
@@ -441,76 +392,13 @@ function GetYtURLComponent(
         aria-label="Options"
       >
         <Tab key="Summary" title="Summary">
-          {/* <Card>
-            <CardBody>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            </CardBody>
-          </Card>   */}
           {videoSummary && <YTSummary videoSummary={videoSummary} />}
         </Tab>
         <Tab key="Sentiment" title="Sentiment Analysis">
-          <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-              <h1 className="text-2xl font-bold">
-                YouTube Comments Sentiment Analysis
-              </h1>
-              <div className="w-full max-w-4xl mt-6">
-                <BarChart chartData={chartData} />
-              </div>
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="w-full max-w-4xl mt-6">
-                  <Chip>Comments</Chip>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {sentimentComments?.map((comment: any, index: any) => (
-                      <Card key={index}>
-                        <CardBody>
-                          <p>
-                            Published:{" "}
-                            {new Date(comment.published_time).toLocaleString()}
-                          </p>
-                          <p>{comment.comment}</p>
-                          <p>Sentiment: {comment.sentiment}</p>
-                          <p>User: {comment.user_name}</p>
-                        </CardBody>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </main>
-          </div>
+         <SentimentTab chartData={chartData} sentimentComments={sentimentComments}/>
         </Tab>
         <Tab key="Comment" title="Comment classifications">
-          <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-              <h1 className="text-2xl font-bold">
-                YouTube Comments Sentiment Analysis
-              </h1>
-              <div className="w-full max-w-4xl mt-6">
-                <BarChart chartData={classificationChartData} />
-              </div>
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="w-full max-w-4xl mt-6">
-                  <Chip>Comments</Chip>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {classifiactionComments?.map((comment: any, index: any) => (
-                      <Card key={index}>
-                        <CardBody>
-                          <p>
-                            Published:{" "}
-                            {new Date(comment.published_time).toLocaleString()}
-                          </p>
-                          <p>{comment.comment}</p>
-                          <p>Sentiment: {comment.sentiment}</p>
-                          <p>User: {comment.user_name}</p>
-                        </CardBody>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </main>
-          </div>
+        <ClassificationCommentTab classificationChartData={classificationChartData} classificationComments={classificationComments} />
         </Tab>
       </Tabs>
     </>
