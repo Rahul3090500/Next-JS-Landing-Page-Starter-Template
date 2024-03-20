@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Chip, Card, CardBody, Tabs, Tab } from '@nextui-org/react';
+import { Card, CardBody, Tabs, Tab } from '@nextui-org/react';
 import BarChart from './BarChart';
 
 interface CommentTabProps {
@@ -7,18 +7,18 @@ interface CommentTabProps {
   classificationComments: any[];
 }
 
-const ClassificationCommentTab: React.FC<CommentTabProps> = ({ classificationChartData, classificationComments }) => {
+const ClassificationCommentTab: React.FC<CommentTabProps> = ({ classificationChartData, classificationComments=[] }) => {
   const [selectedSentenceType, setSelectedSentenceType] = useState<string | number>('All');
-
   const handleSelectionChange = (key: React.Key) => {
     if (typeof key === 'string' || typeof key === 'number') {
       setSelectedSentenceType(key);
     }
   };
 
-  const filteredComments = classificationComments.filter(comment => 
-    selectedSentenceType === 'All' || comment.sentence_type === selectedSentenceType
-  );
+  const filteredComments = classificationComments ? classificationComments.filter(comment => {
+    return selectedSentenceType === 'All' || comment.sentence_type === selectedSentenceType
+  }) : [];
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">

@@ -17,8 +17,14 @@ const ISMS = () => {
   const [videoSummary, setVideoSummary] = useState();
   const [sentimentSummary, setSentimentSummary] = useState();
   const [commentClassificatios, setCommentClassifications] = useState();
-  const [classificationComments, setClassificationComments] = useState()
+  const [classificationComments, setClassificationComments] = useState();
   const [sentimentComments, setSentimentComments] = useState();
+  const [loadingVideoSummary, setLoadingVideoSummary] = useState(false);
+  const [loadingSentimentAnalysis, setLoadingSentimentAnalysis] =
+    useState(false);
+  const [loadingCommentClassifications, setLoadingCommentClassifications] =
+    useState(false);
+
   const [chartData, setChartData] = useState<
     ChartData<"bar", number[], string>
   >({
@@ -111,17 +117,18 @@ const ISMS = () => {
     setVideoSummary(undefined);
     setSentimentComments(undefined);
     setCommentClassifications(undefined);
-    setSentimentComments(undefined)
+    setSentimentComments(undefined);
   };
   const clear = () => {
     setYtURL("");
     setVideoSummary(undefined);
     setSentimentSummary(undefined);
     setCommentClassifications(undefined);
-    setSentimentComments(undefined)
+    setSentimentComments(undefined);
   };
 
   const updateVideoSummary = async () => {
+    setLoadingVideoSummary(true);
     const payload = {
       url: ytURL, // Assuming ytURL is the YouTube URL input by the user
     };
@@ -144,10 +151,13 @@ const ISMS = () => {
       } else {
         console.log("Error", err.message);
       }
+    } finally {
+      setLoadingVideoSummary(false);
     }
   };
 
   const updateSentimentChartData = async () => {
+    setLoadingSentimentAnalysis(true);
     const payload = {
       url: ytURL, // Or a specific URL if needed
     };
@@ -192,10 +202,13 @@ const ISMS = () => {
           data: [],
         })),
       }));
+    } finally {
+      setLoadingSentimentAnalysis(false);
     }
   };
 
   const updateCommentClassificationsChartData = async () => {
+    setLoadingCommentClassifications(true);
     const payload = {
       url: ytURL, // Or a specific URL if needed
     };
@@ -241,10 +254,13 @@ const ISMS = () => {
           data: [],
         })),
       }));
+    } finally {
+      setLoadingCommentClassifications(false);
     }
   };
 
   const fetchAllSentimentAnalysisData = async () => {
+    setLoadingSentimentAnalysis(true);
     const payload = {
       url: ytURL, // Or a specific URL if needed
     };
@@ -259,10 +275,13 @@ const ISMS = () => {
     } catch (error) {
       console.error("Fetching sentiment analysis data failed: ", error);
       // Fallback to local data if API call fails
+    } finally {
+      setLoadingSentimentAnalysis(false);
     }
   };
 
   const fetchAllCommentClassificationsData = async () => {
+    setLoadingCommentClassifications(true);
     const payload = {
       url: ytURL, // Or a specific URL if needed
     };
@@ -277,6 +296,8 @@ const ISMS = () => {
     } catch (error) {
       console.error("Fetching sentiment analysis data failed: ", error);
       // Fallback to local data if API call fails
+    } finally {
+      setLoadingCommentClassifications(false);
     }
   };
 
@@ -357,7 +378,10 @@ const ISMS = () => {
         sentimentComments,
         handleSentimentAnalysis,
         classificationChartData,
-        classificationComments
+        classificationComments,
+        loadingCommentClassifications,
+        loadingSentimentAnalysis,
+        loadingVideoSummary
       )}
     </>
   );
@@ -375,7 +399,11 @@ function GetYtURLComponent(
   sentimentComments: any,
   handleSentimentAnalysis: any,
   classificationChartData: any,
-  classificationComments: any
+  classificationComments: any,
+  loadingVideoSummary: any,
+  loadingSentimentAnalysis: any,
+  loadingCommentClassifications:any
+
 ) {
   return (
     <>
@@ -392,13 +420,26 @@ function GetYtURLComponent(
         aria-label="Options"
       >
         <Tab key="Summary" title="Summary">
-          {videoSummary && <YTSummary videoSummary={videoSummary} />}
+          {loadingVideoSummary ? "loading" : (
+            <>{videoSummary && <YTSummary videoSummary={videoSummary} />}</>
+          )}
         </Tab>
         <Tab key="Sentiment" title="Sentiment Analysis">
-         <SentimentTab chartData={chartData} sentimentComments={sentimentComments}/>
+          {loadingSentimentAnalysis ? "loading" : (
+            <>
+              <SentimentTab
+                chartData={chartData}
+                sentimentComments={sentimentComments}
+              />
+            </>
+          )}
         </Tab>
         <Tab key="Comment" title="Comment classifications">
-        <ClassificationCommentTab classificationChartData={classificationChartData} classificationComments={classificationComments} />
+          {loadingCommentClassifications ? "loading" : (<><ClassificationCommentTab
+            classificationChartData={classificationChartData}
+            classificationComments={classificationComments}
+          /></>)}
+          
         </Tab>
       </Tabs>
     </>
