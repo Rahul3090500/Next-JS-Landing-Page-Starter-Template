@@ -1,15 +1,25 @@
 import api from "@/api";
-import { Button, Input } from "@nextui-org/react";
+import {
+  Button,
+  Input,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  getKeyValue,
+} from "@nextui-org/react";
 import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
 
 import React, { useState } from "react";
 import YTSummary from "./ISMS/YTSummary";
 import BarChart from "./ISMS/BarChart";
 import { ChartData } from "chart.js";
+import { Table, Checkbox } from "@nextui-org/react";
+import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
+import SentimentTab from "./ISMS/SentimentTab";
 import YTURLInput from "./ISMS/YTURLInput";
 import SubmitButton from "./ISMS/SubmitButton";
-import SentimentTab from "./ISMS/SentimentTab";
-import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
@@ -17,7 +27,7 @@ const ISMS = () => {
   const [videoSummary, setVideoSummary] = useState();
   const [sentimentSummary, setSentimentSummary] = useState();
   const [commentClassificatios, setCommentClassifications] = useState();
-  const [classificationComments, setClassificationComments] = useState();
+  const [classifiactionComments, setClassificationComments] = useState();
   const [sentimentComments, setSentimentComments] = useState();
   const [loadingVideoSummary, setLoadingVideoSummary] = useState(false);
   const [loadingSentimentAnalysis, setLoadingSentimentAnalysis] =
@@ -378,7 +388,7 @@ const ISMS = () => {
         sentimentComments,
         handleSentimentAnalysis,
         classificationChartData,
-        classificationComments,
+        classifiactionComments,
         loadingCommentClassifications,
         loadingSentimentAnalysis,
         loadingVideoSummary
@@ -388,6 +398,29 @@ const ISMS = () => {
 };
 
 export default ISMS;
+
+const columns = [
+  {
+    key: "Query",
+    label: "QUERRY",
+  },
+  {
+    key: "user_name",
+    label: "USER NAME",
+  },
+  {
+    key: "published_time",
+    label: "PUBLISHED TIME",
+  },
+  {
+    key: "updated_time",
+    label: "UPDATED TIME",
+  },
+  {
+    key: "Response",
+    label: "RESPONSE",
+  },
+];
 
 function GetYtURLComponent(
   handleOnChange: any,
@@ -405,6 +438,90 @@ function GetYtURLComponent(
   loadingCommentClassifications:any
 
 ) {
+  const [selectedKeys, setSelectedKeys] = React.useState(new Set(["2"]));
+
+  const [rows, setRows] = useState([
+    {
+      Query: "Any other application is there in pipeline ?",
+      Response:
+        "Hello! Yes, we plan to expand to other social media platforms in the future. Currently, we are focusing on sentiment analysis of YouTube video comments using ChatGPT.",
+      Answered: 1,
+      Replied_Response:
+        "Yes, we plan to expand to other social media platforms in the future.",
+      commentId: "Ugz0iM-8eyanbX4kxgh4AaABAg",
+      published_time: "2024-02-28 12:12:04",
+      updated_time: "2024-02-28 12:12:04",
+      user_name: "@SuccessIsAJourneyNotADes-dd5oz",
+    },
+    {
+      Query:
+        "Is there any difference in accuracy while the number of comments gets increased ?",
+      Response:
+        "Hello! The accuracy remains consistent regardless of the number of comments due to the inference method using Chatgpt. Number of comments doesn't affect accuracy.",
+      Answered: 0,
+      Replied_Response: null,
+      commentId: "UgzOirttKhKx6x4Z0ol4AaABAg",
+      published_time: "2024-02-06 08:21:18",
+      updated_time: "2024-02-06 08:21:18",
+      user_name: "@athiramv2312",
+    },
+    {
+      Query:
+        "What improvements are planned for the next version of your analysis tool?",
+      Response:
+        "We're working on integrating more advanced NLP techniques to improve the sentiment detection accuracy, and planning to support analysis of comments in multiple languages.",
+      Answered: 1,
+      Replied_Response:
+        "Advanced NLP techniques and multilingual support are on our roadmap.",
+      commentId: "UgzAdvanc3NLPtech4X4kxgh4AaABAg",
+      published_time: "2024-03-05 10:15:30",
+      updated_time: "2024-03-05 10:15:30",
+      user_name: "@NLPFan123",
+    },
+    {
+      Query: "How does the tool handle spam or irrelevant comments?",
+      Response:
+        "Our tool uses a combination of keyword filtering and sentiment analysis to identify and disregard spam or irrelevant comments, ensuring the analysis is focused on meaningful feedback.",
+      Answered: 1,
+      Replied_Response:
+        "We filter out spam using keyword and sentiment analysis.",
+      commentId: "UgzSpamFilteR0P4l5t6E3Y8Z",
+      published_time: "2024-03-01 09:22:47",
+      updated_time: "2024-03-01 09:22:47",
+      user_name: "@TechModerator",
+    },
+    {
+      Query: "Can the tool detect sarcasm in the comments?",
+      Response:
+        "Detecting sarcasm is a challenging aspect of sentiment analysis. We are currently researching methods to improve sarcasm detection in our next updates.",
+      Answered: 0,
+      Replied_Response: null,
+      commentId: "UgzSarcasmDetecTor4X3k9l2B",
+      published_time: "2024-02-25 14:48:16",
+      updated_time: "2024-02-25 14:48:16",
+      user_name: "@SarcasticUser",
+    },
+  ]);
+  const newDisabledKeys = rows.reduce((acc, item, index) => {
+    if (item.Answered === 1) {
+      acc.push(item.commentId); // NextUI Checkbox expects string[] for disabledKeys
+    }
+    return acc;
+  }, []);
+
+  function handleBirthYearChange(e) {
+
+    console.log("name==>", e)
+    const newValue = e.target.value;
+    setRows((prevItems) => {
+      return prevItems.map((item) => {
+        
+          return { ...item, Response: newValue };
+      });
+    });
+  }
+
+  console.log("disabledKeys==>", newDisabledKeys);
   return (
     <>
       <YTURLInput onChange={handleOnChange} onClear={clear} />
