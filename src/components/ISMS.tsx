@@ -11,7 +11,7 @@ const ISMS = () => {
   const [isButtonLoading, setButtonLoading] = useState(false);
   const [videoSummary, setVideoSummary] = useState({});
   const [chartData, setChartData] = useState<ChartData<"bar", number[], string>>({
-    labels: ['Total', 'Positive', 'Neutral', 'Negative', 'Unknown'],
+    labels: ['Positive', 'Neutral', 'Negative', 'Unknown'],
     datasets: [
       {
         label: 'Comments',
@@ -82,7 +82,7 @@ const ISMS = () => {
         datasets: prevState.datasets.map(dataset => ({
           ...dataset,
           data: [
-            apiResponse.total_comments,
+            // apiResponse.total_comments,
             apiResponse.positive_comments,
             apiResponse.neutral_comments,
             apiResponse.negative_comments,
