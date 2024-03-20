@@ -1,5 +1,5 @@
 import api from "@/api";
-import { Button, Input, Table } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
 import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
 
 import React, { useState } from "react";
@@ -114,14 +114,17 @@ const ISMS = () => {
         },
       ],
     });
-    setVideoSummary(null);
-    setSentimentComments(null);
-    setCommentClassifications(null);
+    setVideoSummary(undefined);
+    setSentimentComments(undefined);
+    setCommentClassifications(undefined);
+    setSentimentComments(undefined)
   };
   const clear = () => {
     setYtURL("");
-    setVideoSummary(null);
-    setSentimentSummary(null);
+    setVideoSummary(undefined);
+    setSentimentSummary(undefined);
+    setCommentClassifications(undefined);
+    setSentimentComments(undefined)
   };
 
   const updateVideoSummary = async () => {
