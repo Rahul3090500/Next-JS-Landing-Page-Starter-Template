@@ -435,8 +435,7 @@ function GetYtURLComponent(
   classificationComments: any,
   loadingVideoSummary: any,
   loadingSentimentAnalysis: any,
-  loadingCommentClassifications:any
-
+  loadingCommentClassifications: any
 ) {
   const [selectedKeys, setSelectedKeys] = React.useState(new Set(["2"]));
 
@@ -502,26 +501,22 @@ function GetYtURLComponent(
       user_name: "@SarcasticUser",
     },
   ]);
-  const newDisabledKeys = rows.reduce((acc, item, index) => {
+  const newDisabledKeys = rows.reduce((acc: any, item: any, index) => {
     if (item.Answered === 1) {
       acc.push(item.commentId); // NextUI Checkbox expects string[] for disabledKeys
     }
     return acc;
   }, []);
 
-  function handleBirthYearChange(e, name) {
-
-    console.log("name==>", e, name)
+  function handleBirthYearChange(e: any, name: any) {
+    console.log("name==>", e, name);
     const newValue = e.target.value;
     setRows((prevItems) => {
       return prevItems.map((item) => {
-        
-          return { ...item, Response: newValue };
+        return { ...item, Response: newValue };
       });
     });
   }
-
- 
 
   console.log("disabledKeys==>", newDisabledKeys);
   return (
@@ -532,35 +527,38 @@ function GetYtURLComponent(
         onSubmit={handleSubmit}
         buttonText="Save"
       />
-       <Table 
-      aria-label="Controlled table example with dynamic content"
-      selectionMode="multiple"
-      disabledKeys={newDisabledKeys}
-      selectedKeys={selectedKeys}
-      onSelectionChange={setSelectedKeys}
-    >
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody items={rows}>
-        {(item) => (
-          <TableRow key={item.commentId}>
-          {(columnKey) => 
-            columnKey === 'Response' ? 
-            <TableCell>
-              <input 
-                type="text" 
-                value={getKeyValue(item, columnKey)} 
-                onChange={(e) => handleBirthYearChange(e, item.commentId)} 
-              />
-            </TableCell> 
-            : 
-            <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-          }
-        </TableRow>
-        )}
-      </TableBody>
-    </Table>
+      <Table
+        aria-label="Controlled table example with dynamic content"
+        selectionMode="multiple"
+        disabledKeys={newDisabledKeys}
+        selectedKeys={selectedKeys}
+        onSelectionChange={setSelectedKeys}
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn key={column.key}>{column.label}</TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={rows}>
+          {(item) => (
+            <TableRow key={item.commentId}>
+              {(columnKey) =>
+                columnKey === "Response" ? (
+                  <TableCell>
+                    <input
+                      type="text"
+                      value={getKeyValue(item, columnKey)}
+                      onChange={(e) => handleBirthYearChange(e, item.commentId)}
+                    />
+                  </TableCell>
+                ) : (
+                  <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                )
+              }
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       <Tabs
         onSelectionChange={handleSentimentAnalysis}
         size={"lg"}
@@ -568,26 +566,71 @@ function GetYtURLComponent(
         aria-label="Options"
       >
         <Tab key="Summary" title="Summary">
-          {loadingVideoSummary ? "loading" : (
-            <>{videoSummary && <YTSummary videoSummary={videoSummary} />}</>
+          {loadingVideoSummary ? (
+            "loading"
+          ) : (
+            <>
+              {videoSummary ? (
+                <YTSummary videoSummary={videoSummary} />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
+                    Add YouTube URL
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </Tab>
         <Tab key="Sentiment" title="Sentiment Analysis">
-          {loadingSentimentAnalysis ? "loading" : (
+          {loadingSentimentAnalysis ? (
+            "loading"
+          ) : (
             <>
-              <SentimentTab
-                chartData={chartData}
-                sentimentComments={sentimentComments}
-              />
+              {chartData && sentimentComments ? (
+                <>
+                  {" "}
+                  <SentimentTab
+                    chartData={chartData}
+                    sentimentComments={sentimentComments}
+                  />
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
+                    Add YouTube URL
+                  </p>
+                </div>
+              )}
             </>
           )}
         </Tab>
         <Tab key="Comment" title="Comment classifications">
-          {loadingCommentClassifications ? "loading" : (<><ClassificationCommentTab
-            classificationChartData={classificationChartData}
-            classificationComments={classificationComments}
-          /></>)}
-          
+          {loadingCommentClassifications ? (
+            <div className="flex items-center justify-center w-full h-full">
+              <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
+                Add YouTube URL
+              </p>
+            </div>
+          ) : (
+            <>
+              {classificationChartData && classificationComments ? (
+                <>
+                  {" "}
+                  <ClassificationCommentTab
+                    classificationChartData={classificationChartData}
+                    classificationComments={classificationComments}
+                  />
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
+                    Add YouTube URL
+                  </p>
+                </div>
+              )}
+            </>
+          )}
         </Tab>
       </Tabs>
     </>
