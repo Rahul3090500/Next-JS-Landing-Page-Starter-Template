@@ -58,9 +58,7 @@ const ISMS = () => {
 export default ISMS;
 
 function GetYtURLComponent(
-  handleOnChange: (event: {
-    target: { value: React.SetStateAction<string> };
-  }) => void,
+  handleOnChange:any,
   clear: () => void,
   isButtonLoading: boolean,
   handleSubmit: () => Promise<void>
