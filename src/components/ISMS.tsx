@@ -1,12 +1,39 @@
 import api from "@/api";
 import { Button, Input } from "@nextui-org/react";
-
+import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import React, { useState } from "react";
+import YTSummary from "./YTSummary";
+import BarChart from '../components/BarChart';
+import { ChartData } from 'chart.js';
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
   const [isButtonLoading, setButtonLoading] = useState(false);
   const [videoSummary, setVideoSummary] = useState({});
+  const [chartData, setChartData] = useState<ChartData<"bar", number[], string>>({
+    labels: ['Total', 'Positive', 'Neutral', 'Negative', 'Unknown'],
+    datasets: [
+      {
+        label: 'Comments',
+        data: [], // Data will be populated from API
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  });
 
   const handleOnChange = (event: {
     target: { value: React.SetStateAction<string> };
@@ -24,6 +51,7 @@ const ISMS = () => {
       url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
     };
     try {
+    
       const response = await api.post("/get_video_summary", payload);
       console.log("response==>", response);
       //@ts-ignore
@@ -41,6 +69,27 @@ const ISMS = () => {
         video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
         video_views: 68,
       });
+      const apiResponse = {
+        video_url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
+        total_comments: 33,
+        negative_comments: 0,
+        neutral_comments: 28,
+        positive_comments: 5,
+        unknown_comments: 0,
+      };
+      setChartData(prevState => ({
+        ...prevState,
+        datasets: prevState.datasets.map(dataset => ({
+          ...dataset,
+          data: [
+            apiResponse.total_comments,
+            apiResponse.positive_comments,
+            apiResponse.neutral_comments,
+            apiResponse.negative_comments,
+            apiResponse.unknown_comments,
+          ],
+        })),
+      }));
     }
     setButtonLoading(false);
 
@@ -50,7 +99,7 @@ const ISMS = () => {
 
   return (
     <>
-      {GetYtURLComponent(handleOnChange, clear, isButtonLoading, handleSubmit)}
+      {GetYtURLComponent(handleOnChange, clear, isButtonLoading, handleSubmit, videoSummary,chartData)}
     </>
   );
 };
@@ -58,10 +107,12 @@ const ISMS = () => {
 export default ISMS;
 
 function GetYtURLComponent(
-  handleOnChange:any,
+  handleOnChange: any,
   clear: () => void,
   isButtonLoading: boolean,
-  handleSubmit: () => Promise<void>
+  handleSubmit: () => Promise<void>,
+  videoSummary: any,
+  chartData:any
 ) {
   return (
     <>
@@ -100,6 +151,34 @@ function GetYtURLComponent(
       >
         Submit
       </Button>
+      <Tabs size={"lg"} fullWidth={true} aria-label="Options">
+        <Tab key="Summary" title="Summary">
+          {/* <Card>
+            <CardBody>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </CardBody>
+          </Card>   */}
+          <YTSummary videoSummary = {videoSummary} />
+        </Tab>
+        <Tab key="Sentiment" title="Sentiment Analysis">
+        <div className="flex flex-col items-center justify-center min-h-screen py-2">
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+        <h1 className="text-2xl font-bold">YouTube Comments Sentiment Analysis</h1>
+        <div className="w-full max-w-4xl mt-6">
+          <BarChart chartData={chartData} />
+        </div>
+      </main>
+    </div>
+        </Tab>
+        <Tab key="Comment" title="Comment classifications">
+          <Card>
+            <CardBody>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </CardBody>
+          </Card>
+        </Tab>
+      </Tabs>
     </>
   );
 }
