@@ -1,7 +1,5 @@
 import api from "@/api";
 import {
-  Button,
-  Input,
   TableBody,
   TableCell,
   TableColumn,
@@ -20,6 +18,7 @@ import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 import SentimentTab from "./ISMS/SentimentTab";
 import YTURLInput from "./ISMS/YTURLInput";
 import SubmitButton from "./ISMS/SubmitButton";
+import { Spinner } from "@nextui-org/react";
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
@@ -567,8 +566,8 @@ function GetYtURLComponent(
       >
         <Tab key="Summary" title="Summary">
           {loadingVideoSummary ? (
-            "loading"
-          ) : (
+            <Spinner size="lg" color="secondary" className="spinnerLoader" />
+            ) : (
             <>
               {videoSummary ? (
                 <YTSummary videoSummary={videoSummary} />
@@ -584,7 +583,7 @@ function GetYtURLComponent(
         </Tab>
         <Tab key="Sentiment" title="Sentiment Analysis">
           {loadingSentimentAnalysis ? (
-            "loading"
+            <Spinner size="lg" color="secondary" className="spinnerLoader" />
           ) : (
             <>
               {chartData && sentimentComments ? (
@@ -607,16 +606,11 @@ function GetYtURLComponent(
         </Tab>
         <Tab key="Comment" title="Comment classifications">
           {loadingCommentClassifications ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
-                Add YouTube URL
-              </p>
-            </div>
-          ) : (
+            <Spinner size="lg" color="secondary" className="spinnerLoader" />
+            ) : (
             <>
               {classificationChartData && classificationComments ? (
                 <>
-                  {" "}
                   <ClassificationCommentTab
                     classificationChartData={classificationChartData}
                     classificationComments={classificationComments}

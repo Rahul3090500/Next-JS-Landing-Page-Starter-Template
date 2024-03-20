@@ -4,7 +4,9 @@
 
 @tailwind utilities;
 
-
+body {
+  overflow-x: hidden;
+}
 
 .commentsMain {
   display: flex;
@@ -34,6 +36,14 @@
   backdrop-filter: blur(50px); 
   -webkit-backdrop-filter: blur(50px); 
   color: #000; 
+}
+.spinnerLoader {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  height:60vh;
+  scale:3;
+  
 }
 
 .pagenation {
