@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import {
   Modal,
   ModalContent,
@@ -9,21 +9,21 @@ import {
 } from "@nextui-org/react";
 import { useYoutubeContext } from "@/hooks/urlcontext";
 import API from "@/utils/api.config";
-export default function FileInputModal({ IsOpen, setIsOpen }) {
+export default function FileInputModal({ IsOpen, setIsOpen }:any) {
   const {setRowData,setDataFileName,youtubeUrl,dataFileName}=useYoutubeContext()
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files) {
-      const file = event.target.files[0];
+      const file:any = event.target.files[0];
       // Do something with the selected file, such as uploading it
       const formData = new FormData();
       formData.append("file", file);
       setDataFileName(file?.name)
       // Make a POST request to your API endpoint
       try {
-        const response = await API.post(
+        const response:any = await API.post(
           "upload_file",
           {
             url: youtubeUrl,
@@ -35,6 +35,7 @@ export default function FileInputModal({ IsOpen, setIsOpen }) {
             },
           }
         );
+        console.log('response',response )
         
         setDataFileName(file?.name)
 
@@ -128,6 +129,7 @@ export default function FileInputModal({ IsOpen, setIsOpen }) {
       );
       let res=response.data
       res = res.replace(/NaN/g, "0");
+      console.log('res',res)
       
     }} catch (error) {
       console.error("Error uploading file:", error);

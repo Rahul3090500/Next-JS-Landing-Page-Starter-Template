@@ -52,6 +52,7 @@ const PdfUploader = () => {
    
 
       {rowData.length > 0 && (<>
+      {/* @ts-ignore */}
         <StyledTableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -77,7 +78,7 @@ const PdfUploader = () => {
                       checked={item.selected ?? false}
                       onChange={(event) => {
                         const newItem = { ...item, selected: event.target.checked };
-                        setRowData((prev) => prev.map((it) => it.commentId === newItem.commentId ? newItem : it));
+                        setRowData((prev:any) => prev.map((it:any) => it.commentId === newItem.commentId ? newItem : it));
                       }}
                       disabled={item.Answered}
                     />
@@ -92,7 +93,7 @@ const PdfUploader = () => {
                       value={item.Response}
                       onChange={(event) => {
                         const newItem = { ...item, Response: event.target.value };
-                        setRowData((prev) => prev.map((it) => it.commentId === newItem.commentId ? newItem : it));
+                        setRowData((prev:any) => prev.map((it:any) => it.commentId === newItem.commentId ? newItem : it));
                       }}
                     />
                   </TableCell>

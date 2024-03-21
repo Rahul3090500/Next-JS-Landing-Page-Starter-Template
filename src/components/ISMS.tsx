@@ -412,7 +412,7 @@ const ISMS = () => {
     setButtonLoading(false);
   };
   console.log("videoSummary===>", videoSummary);
-  const handleSentimentAnalysis = async (key: String) => {
+  const handleSentimentAnalysis = async (key: any) => {
     if (key === "Sentiment") {
       if (sentimentSummary) {
         const {

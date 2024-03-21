@@ -24,7 +24,7 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
     }
   };
 
-  const filteredComments = classifiactionComments.filter((comment) => {
+  const filteredComments = classifiactionComments.filter((comment:any) => {
     return (
       selectedSentenceType === "All" ||
       comment.sentence_type === selectedSentenceType
@@ -103,7 +103,7 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
             )}
           </TableHeader>
           <TableBody items={items}>
-            {(item) => (
+            {(item:any) => (
               <TableRow  className="singleComment" key={item.commentId}>
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>

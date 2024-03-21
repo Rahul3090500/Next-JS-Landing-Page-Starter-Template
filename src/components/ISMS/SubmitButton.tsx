@@ -14,15 +14,17 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
   buttonText = 'Submit', // Default button text is 'Submit'
 }) => {
   return (
-    <Box display="flex" justifyContent="right" ml={2}>
+    <Box  ml={2}>
 
     <Button
  variant="contained"
  color="secondary"
  onClick={onSubmit}
+ 
  disabled={isLoading}
  startIcon={isLoading && <CircularProgress size={24} color="inherit" />}
  sx={{
+  height:'55px',
   backgroundColor: '#1977d3 !important', 
   color: '#fff',
   '&:hover': {

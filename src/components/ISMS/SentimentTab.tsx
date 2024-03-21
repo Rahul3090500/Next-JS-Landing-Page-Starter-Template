@@ -36,7 +36,7 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 6;
   const filteredComments = sentimentComments.filter(
-    (comment) =>
+    (comment:any) =>
       selectedSentiment === "All" || comment.sentiment === selectedSentiment
   );
 
@@ -138,7 +138,7 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
             )}
           </TableHeader>
           <TableBody items={items}>
-            {(item) => (
+            {(item:any) => (
               <TableRow className="singleComment" key={item.commentId}>
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>

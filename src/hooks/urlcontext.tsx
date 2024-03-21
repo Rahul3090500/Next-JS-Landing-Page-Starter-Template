@@ -3,13 +3,13 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 // Define the types for your context
 interface YoutubeContextType {
   youtubeUrl: string;
-  setYoutubeUrl: React.Dispatch<React.SetStateAction<string>>;
+  setYoutubeUrl: any;
   dataFileName: string;
-  setDataFileName: React.Dispatch<React.SetStateAction<string>>;
+  setDataFileName: any;
   tokenFileName: string;
-  setTokenFileName: React.Dispatch<React.SetStateAction<string>>;
+  setTokenFileName: any;
   rowData: any[]; // Change 'any' to the type of your row data if known
-  setRowData: React.Dispatch<React.SetStateAction<any[]>>; // Change 'any' to the type of your row data if known
+  setRowData: any; // Change 'any' to the type of your row data if known
 }
 
 // Create the context

@@ -14,7 +14,7 @@ import {
 import API from "@/utils/api.config";
 import { useYoutubeContext } from "@/hooks/urlcontext";
 
-export default function FileModal({ IsOpen, setIsOpen }) {
+export default function FileModal({ IsOpen, setIsOpen }:any) {
   const { rowData,youtubeUrl} = useYoutubeContext();
   const [authData, setAuthData] = useState(null);
 
@@ -39,6 +39,7 @@ export default function FileModal({ IsOpen, setIsOpen }) {
             credential_file: "authentication_response.json",
             reply_list: payload,
           });
+          console.log('res',res )
         } catch (error) {
           console.error("Error uploading file:", error);
         }
@@ -48,11 +49,11 @@ export default function FileModal({ IsOpen, setIsOpen }) {
     auth();
   }, [authData]);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = (event:any) => {
     const file = event.target.files[0];
     const reader = new FileReader();
 
-    reader.onload = (event) => {
+    reader.onload = (event:any) => {
       try {
         const jsonData = JSON.parse(event.target.result);
         console.log(jsonData);
