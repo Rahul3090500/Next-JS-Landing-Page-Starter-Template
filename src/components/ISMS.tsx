@@ -1,23 +1,17 @@
 import api from "@/api";
-import {
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  getKeyValue,
-} from "@nextui-org/react";
 import { Tabs, Tab} from "@nextui-org/react";
 
 import React, { useState } from "react";
 import YTSummary from "./ISMS/YTSummary";
 import { ChartData } from "chart.js";
-import { Table } from "@nextui-org/react";
 import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 import SentimentTab from "./ISMS/SentimentTab";
 import YTURLInput from "./ISMS/YTURLInput";
 import SubmitButton from "./ISMS/SubmitButton";
 import PdfUploader from "./table";
+import { Button } from "@mui/material";
+import FileInputModal from "./file";
+import { useYoutubeContext } from "@/hooks/urlcontext";
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
@@ -414,7 +408,10 @@ function GetYtURLComponent(
   loadingSentimentAnalysis: any,
   loadingCommentClassifications: any
 ) {
-  const [ShowPdfs, setShowPdfs] = React.useState(false);
+  const {rowData}=useYoutubeContext()  
+  const [isFileOpener, setIsFileOpener] = useState(false)
+
+  console.log("rowData: " + rowData)
 
 
   
@@ -479,11 +476,16 @@ function GetYtURLComponent(
           )}
         </Tab>
       </Tabs>
-      <Button variant="contained" onClick={()=>setShowPdfs(true)} component="label">
+      <Button variant="contained" onClick={()=>setIsFileOpener(true)} component="label">
        Generate AI
       </Button>
+      
+      
       {
-        ShowPdfs && <PdfUploader />
+        isFileOpener && <FileInputModal IsOpen={isFileOpener} setIsOpen={setIsFileOpener}  />
+      }
+      {
+        rowData.length>0 && <PdfUploader />
       }
     </>
   );

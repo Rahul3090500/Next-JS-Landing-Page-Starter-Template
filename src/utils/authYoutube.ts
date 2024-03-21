@@ -1,5 +1,7 @@
 // import { google } from "googleapis";
 
+import API from "./api.config";
+
 const saveJsonToFile = async(data, filename) => {
   const json = JSON.stringify(data);
   const blob = new Blob([json], { type: 'application/json' });
@@ -19,33 +21,39 @@ export const authenticateWithYouTube = async (credentials) => {
   return credentials
 };
 
-export const uploadFileToServer = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file, 'authentication_response.json');
+export const uploadFileToServer = async (file,youtubeUrl) => {
+  const jsonData = JSON.stringify(file);
+
+    // Create Blob object from JSON data
+    const blob = new Blob([jsonData], { type: 'application/json' });
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append('file', blob, 'authentication_response.json');
+  
 
   try {
-    const response = await fetch('https://your-server-endpoint.com/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload file');
-    }
-
-    console.log('File uploaded successfully');
+    const response = await API.post('upload_file', {
+      url: youtubeUrl,
+      filename: formData,
+    },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+   
   } catch (error) {
     console.error('Error uploading file:', error);
   }
+  return null
 };
 
 // Function to handle the authentication response and save it to a JSON file
-export const handleAuthenticationResponse = async(response) => {
-  console.log('handleAuthenticationResponse')
-  await saveJsonToFile(response, 'authentication_response.json');
-  console.log('handleAuthenticationResponse')
-  await uploadFileToServer(response);
-  console.log('handleAuthenticationResponse')
+export const handleAuthenticationResponse = async(response,youtubeUrl) => {
+  console.log('handleAuthenticationResponse') 
+  await uploadFileToServer(response,youtubeUrl);
+  
 };
 
 

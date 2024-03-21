@@ -12,32 +12,36 @@ import {
   handleAuthenticationResponse,
 } from "@/utils/authYoutube";
 import API from "@/utils/api.config";
+import { useYoutubeContext } from "@/hooks/urlcontext";
 
-export default function FileModal({ IsOpen, setIsOpen, apiData }) {
+export default function FileModal({ IsOpen, setIsOpen }) {
+  const { rowData,youtubeUrl} = useYoutubeContext();
   const [authData, setAuthData] = useState(null);
 
   useEffect(() => {
     const auth = async () => {
-      const data = apiData.filter((it) => it.selected == true);
+      const data = rowData.filter((it) => it.selected == true);
       const payload = data.map((it) => {
         return {
-          answered: it?.Response,
-          Comment: it?.commentId,
+          answer: it?.Response,
+          commentId: it?.commentId,
         };
       });
 
-      console.log("Authenticating with YouTube", apiData);
-      if (authData) {
+      
+      if (rowData.length > 0) {
         try {
           const response=await authenticateWithYouTube(authData)
-          await handleAuthenticationResponse(response);
+          await handleAuthenticationResponse(response,youtubeUrl);
           const res = await API.post("auto_reply_multi_select", {
-            url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
+            url: youtubeUrl,
             model_type: "advanced",
             credential_file: "authentication_response.json",
             reply_list: payload,
           });
-        } catch (error) {}
+        } catch (error) {
+          console.error("Error uploading file:", error);
+        }
       }
     };
 
