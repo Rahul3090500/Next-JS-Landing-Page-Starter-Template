@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { Tabs, Tab, Pagination } from "@nextui-org/react";
+import {
+  Tabs,
+  Tab,
+  Pagination,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  getKeyValue,
+  Table,
+} from "@nextui-org/react";
 import BarChart from "./BarChart";
 
 interface SentimentTabProps {
@@ -12,29 +23,64 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
   sentimentComments = [],
 }) => {
   const [selectedSentiment, setSelectedSentiment] = useState<string>("All");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const commentsPerPage = 5;
+  // const [currentPage, setCurrentPage] = useState<number>(1);
+  const commentsPerPage = 6;
 
   const handleSelectionChange = (key: React.Key | null) => {
     if (typeof key === "string") {
       setSelectedSentiment(key);
-      setCurrentPage(1); // Reset to the first page upon changing the sentiment filter
+      setPage(1); // Reset to the first page upon changing the sentiment filter
     }
   };
 
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 6;
   const filteredComments = sentimentComments.filter(
     (comment) =>
       selectedSentiment === "All" || comment.sentiment === selectedSentiment
   );
 
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = filteredComments.slice(
-    indexOfFirstComment,
-    indexOfLastComment
-  );
 
-  const totalPages = Math.ceil(filteredComments.length / commentsPerPage);
+
+  // const currentComments = filteredComments.slice(
+  //   indexOfFirstComment,
+  //   indexOfLastComment
+  // );
+
+  const pages = Math.ceil(filteredComments.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredComments.slice(start, end);
+  }, [page, filteredComments]);
+
+  console.log("currentComments===>", filteredComments)
+
+
+
+  const columns = [
+    
+    {
+      key: "user_name",
+      label: "USER NAME",
+    },
+    {
+      key: "published_time",
+      label: "PUBLISHED TIME",
+    },
+    {
+      key: "updated_time",
+      label: "UPDATED TIME",
+    },
+    {
+      key: "comment",
+      label: "COMMENT",
+    },
+  ];
+
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -50,40 +96,57 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
             selectedKey={selectedSentiment}
             onSelectionChange={handleSelectionChange}
           >
-            <Tab key="All">All</Tab>
-            <Tab key="Positive">Positive</Tab>
-            <Tab key="Neutral">Neutral</Tab>
-            <Tab key="Negative">Negative</Tab>
-            <Tab key="Unknown">Unknown</Tab>
+            <Tab  key="All">
+              All
+            </Tab>
+            <Tab key="Positive">
+              Positive
+            </Tab>
+            <Tab key="Neutral">
+              Neutral
+            </Tab>
+            <Tab  key="Negative">
+              Negative
+            </Tab>
+            <Tab key="Unknown">
+              Unknown
+            </Tab>
           </Tabs>
         </div>
-        <div className="flex flex-col items-center justify-center py-2">
-          <div className="w-[100%] items-start flex column mt-6">
-            <div className="commentsMain">
-              {currentComments.map((comment: any, index: number) => (
-                <div className="singleComment" key={index}>
-                  <p>
-                    Published:{" "}
-                    {new Date(comment.published_time).toLocaleString()}
-                  </p>
-                  <p>{comment.comment}</p>
-                  <p>Sentiment: {comment.sentiment}</p>
-                  <p>User: {comment.user_name}</p>
-                </div>
-              ))}
-              {totalPages > 1 && (
-                <Pagination
-                  total={totalPages}
-                  initialPage={1}
-                  page={currentPage}
-                  onChange={(page) => setCurrentPage(page)}
-                  color="secondary"
-                  className="pagenation"
-                />
-              )}
+        <Table
+          aria-label="Example table with client side pagination"
+          bottomContent={
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="secondary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
             </div>
-          </div>
-        </div>
+          }
+          classNames={{
+            wrapper: "min-h-[222px] flex  justify-cente",
+          }}
+        >
+          <TableHeader columns={columns} >
+            {(column) => (
+              <TableColumn key={column.key}>{column.label}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={items}>
+            {(item) => (
+              <TableRow key={item.commentId}>
+                {(columnKey) => (
+                  <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </main>
     </div>
   );

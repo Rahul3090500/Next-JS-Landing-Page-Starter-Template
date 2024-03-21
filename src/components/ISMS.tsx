@@ -7,18 +7,17 @@ import {
   TableRow,
   getKeyValue,
 } from "@nextui-org/react";
-import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
+import { Tabs, Tab} from "@nextui-org/react";
 
 import React, { useState } from "react";
 import YTSummary from "./ISMS/YTSummary";
-import BarChart from "./ISMS/BarChart";
 import { ChartData } from "chart.js";
-import { Table, Checkbox } from "@nextui-org/react";
+import { Table } from "@nextui-org/react";
 import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 import SentimentTab from "./ISMS/SentimentTab";
 import YTURLInput from "./ISMS/YTURLInput";
 import SubmitButton from "./ISMS/SubmitButton";
-import { Spinner } from "@nextui-org/react";
+
 
 const ISMS = () => {
   const [ytURL, setYtURL] = useState("");
@@ -500,14 +499,14 @@ function GetYtURLComponent(
       user_name: "@SarcasticUser",
     },
   ]);
-  const newDisabledKeys = rows.reduce((acc: any, item: any, index) => {
+  const newDisabledKeys = rows.reduce((acc: any, item: any) => {
     if (item.Answered === 1) {
       acc.push(item.commentId); // NextUI Checkbox expects string[] for disabledKeys
     }
     return acc;
   }, []);
 
-  function handleBirthYearChange(e: any, name: any) {
+  function handleBirthYearChange(e: React.ChangeEvent<HTMLInputElement>, name: string) {
     console.log("name==>", e, name);
     const newValue = e.target.value;
     setRows((prevItems) => {
@@ -531,6 +530,7 @@ function GetYtURLComponent(
         selectionMode="multiple"
         disabledKeys={newDisabledKeys}
         selectedKeys={selectedKeys}
+        //@ts-ignore
         onSelectionChange={setSelectedKeys}
       >
         <TableHeader columns={columns}>
@@ -564,26 +564,16 @@ function GetYtURLComponent(
         fullWidth={true}
         aria-label="Options"
       >
-        <Tab key="Summary" title="Summary">
+        <Tab  key="Summary" title="Summary">
           {loadingVideoSummary ? (
-            <Spinner size="lg" color="secondary" className="spinnerLoader" />
-            ) : (
-            <>
-              {videoSummary ? (
-                <YTSummary videoSummary={videoSummary} />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full">
-                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
-                    Add YouTube URL
-                  </p>
-                </div>
-              )}
-            </>
+            "loading"
+          ) : (
+            <>{videoSummary && <YTSummary videoSummary={videoSummary} />}</>
           )}
         </Tab>
-        <Tab key="Sentiment" title="Sentiment Analysis">
+        <Tab  isDisabled= {!videoSummary} key="Sentiment" title="Sentiment Analysis">
           {loadingSentimentAnalysis ? (
-            <Spinner size="lg" color="secondary" className="spinnerLoader" />
+            "loading"
           ) : (
             <>
               {chartData && sentimentComments ? (
@@ -604,25 +594,15 @@ function GetYtURLComponent(
             </>
           )}
         </Tab>
-        <Tab key="Comment" title="Comment classifications">
+        <Tab isDisabled={!videoSummary} key="Comment" title="Comment classifications">
           {loadingCommentClassifications ? (
-            <Spinner size="lg" color="secondary" className="spinnerLoader" />
-            ) : (
+            "loading"
+          ) : (
             <>
-              {classificationChartData && classificationComments ? (
-                <>
-                  <ClassificationCommentTab
-                    classificationChartData={classificationChartData}
-                    classificationComments={classificationComments}
-                  />
-                </>
-              ) : (
-                <div className="flex items-center justify-center w-full h-full">
-                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
-                    Add YouTube URL
-                  </p>
-                </div>
-              )}
+              <ClassificationCommentTab
+                classificationChartData={classificationChartData}
+                classificationComments={classificationComments}
+              />
             </>
           )}
         </Tab>

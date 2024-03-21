@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardBody, Tabs, Tab, Pagination } from "@nextui-org/react";
+import {Tabs, Tab, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue } from "@nextui-org/react";
 import BarChart from "./BarChart";
 
 interface CommentTabProps {
@@ -14,13 +14,13 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
   const [selectedSentenceType, setSelectedSentenceType] = useState<
     string | number
   >("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 5;
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 6;
 
   const handleSelectionChange = (key: React.Key) => {
     if (typeof key === "string" || typeof key === "number") {
       setSelectedSentenceType(key);
-      setCurrentPage(1); // Reset to first page when changing filter
+      setPage(1); // Reset to first page when changing filter
     }
   };
 
@@ -31,18 +31,34 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
     );
   });
 
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = filteredComments.slice(
-    indexOfFirstComment,
-    indexOfLastComment
-  );
+  const pages = Math.ceil(filteredComments.length / rowsPerPage);
 
-  const totalPages = Math.ceil(filteredComments.length / commentsPerPage);
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    return filteredComments.slice(start, end);
+  }, [page, filteredComments]);
+
+  const columns = [
+    
+    {
+      key: "user_name",
+      label: "USER NAME",
+    },
+    {
+      key: "published_time",
+      label: "PUBLISHED TIME",
+    },
+    {
+      key: "updated_time",
+      label: "UPDATED TIME",
+    },
+    {
+      key: "comment",
+      label: "COMMENT",
+    },
+  ];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -62,26 +78,40 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
           <Tab key="Exclamatory">Exclamatory</Tab>{" "}
           {/* Example addition if applicable */}
         </Tabs>
-        <div className="commentsMain">
-          {currentComments.map((comment, index) => (
-            <div className="singleComment" key={index}>
-              <p>
-                Published: {new Date(comment.published_time).toLocaleString()}
-              </p>
-              <p>{comment.comment}</p>
-              <p>Type: {comment.sentence_type}</p>
-              <p>User: {comment.user_name}</p>
+        <Table
+          aria-label="Example table with client side pagination"
+          bottomContent={
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color="secondary"
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
             </div>
-          ))}
-          <Pagination
-            total={totalPages}
-            initialPage={1}
-            page={currentPage}
-            onChange={handlePageChange}
-            color="secondary"
-            className='pagenation'
-          />
-        </div>
+          }
+          classNames={{
+            wrapper: "min-h-[222px] flex  justify-cente",
+          }}
+        >
+          <TableHeader columns={columns} >
+            {(column) => (
+              <TableColumn key={column.key}>{column.label}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={items}>
+            {(item) => (
+              <TableRow key={item.commentId}>
+                {(columnKey) => (
+                  <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </main>
     </div>
   );
