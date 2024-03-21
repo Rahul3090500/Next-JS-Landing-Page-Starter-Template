@@ -1,19 +1,33 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 import Checkbox from "@mui/material/Checkbox";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import FileInput from "../../compononets/file";
+import FileInput from "./file";
+import { Button } from "@mui/material";
+import FileModal from "./modal/filemodal";
+import Card from "./modal/card";
+import API from "@/utils/api.config";
+
+interface ApiDataItem {
+  Answered: number;
+  Query: string;
+  Replied_Response: number | null; // Assuming the type of Replied_Response is number or null, update as needed
+  Response: string;
+  commentId: string;
+  published_time: string;
+  updated_time: string;
+  user_name: string;
+  selected?: boolean; // Optional property
+}
 
 const PdfUploader = () => {
-  const [file, setFile] = useState(null);
-  const [apiData, setApiData] = useState([
+  const [selectedfile, setFile] = useState(null);
+  const [openCredentailsFile, setOpenCredentailsFile] = useState<Boolean>(false)
+  const [apiData, setApiData] = useState<ApiDataItem[]>([
     {
       Answered: 0,
       Query: "Difference between positive and negative sentiments ?",
@@ -124,137 +138,138 @@ const PdfUploader = () => {
       published_time: "2024-02-06 08:17:28",
       updated_time: "2024-02-06 08:17:28",
       user_name: "@athiramv2312",
-    },
+    }
   ]);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+ 
 
-  const handleCheckboxChange = (event, id) => {
-    const updatedData = apiData.map((item) =>
-      item.commentId === id ? { ...item, selected: event.target.checked } : item
-    );
-    // Update state or perform other actions with updatedData
-    setApiData(updatedData);
-    console.log(updatedData);
-  };
+  
 
-  const handleSubmit = async () => {
+  const handleFileSubmit = async () => {
     try {
-      const response = await axios.post(
-        "http://20.244.47.51:8080/v1/query_answer",
+      if(selectedfile){
+      
+      const response = await API.post("query_answer",
         {
-          url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-          model_type: "advanced",
-          token_path:
-            "./swagger_server/algorithm_impl/auto_reply/lijoy_credentials.json",
-          answer:
-            "Hello! No, the model is not using Langchain in the implementation",
-          commentId: "UgxylBfogE-oWfVIvyN4AaABAg",
+          "url": "https://www.youtube.com/watch?v=f5YdhPYsk3U",
+          "pdf_file": "sentiment.pdf",
+          "model_type": "advanced"
         }
+        
       );
-      setApiData(response.data);
-    } catch (error) {
+      let res=response.data
+      res = res.replace(/NaN/g, "0");
+
+      setApiData(JSON.parse(res));
+     // console.error("Error uploading file:",typeof  response.data,JSON.parse(response.data));
+      
+    }} catch (error) {
       console.error("Error uploading file:", error);
     }
+  
   };
 
-  const handleResSubmit = async () => {
-    try {
-      const data = apiData.filter((item) => item.selected == true);
-      if (data.length == 1) {
-        const response = await axios.post(
-          "http://20.244.47.51:8080/v1/query_answer",
-          {
-            url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-            model_type: "advanced",
-            token_path:
-              "./swagger_server/algorithm_impl/auto_reply/lijoy_credentials.json",
-            answer:
-              "Hello! No, the model is not using Langchain in the implementation",
-            commentId: "UgxylBfogE-oWfVIvyN4AaABAg",
-          }
-        );
-      } else if (data.length > 1) {
-        const reply_list = data.map((item) => {
-          return {
-            answer: item.Answered,
-            commentId: item.commentId,
-          };
-        });
-        const response = await axios.post(
-          "http://20.244.47.51:8080/v1/query_answer",
-          {
-            url: "https://www.youtube.com/watch?v=f5YdhPYsk3U",
-            model_type: "advanced",
-            token_path:
-              "./swagger_server/algorithm_impl/auto_reply/lijoy_credentials.json",
-            reply_list: reply_list,
-          }
-        );
-      }
-    } catch (error) {}
-  };
-
+  
   return (
     <div>
+      <div className="flex flex-row">
       <FileInput
-        file={file}
-        setFile={setFile}
-        handleFileUpload={handleSubmit}
+        setSelectedFile={setFile}
+       
       />
-      <Button variant="contained" component="label">
+      <Button variant="contained" onClick={handleFileSubmit} component="label">
+        Upload File
+      </Button>
+      <Button variant="contained" onClick={()=>setOpenCredentailsFile(true)} component="label">
         Submit Response
       </Button>
-
-      <div
-        style={{
-          marginRight: "100px",
-          marginLeft: "100px",
-          margin: "5px",
-          height: "100x",
-          width: "1000px",
-          overflow: "auto",
-          border: "4px solid #000000", // Note: This color value might not be correct, make sure to use the correct color
-        }}
-      >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Checkbox</TableCell>
-              <TableCell>Answered</TableCell>
-              <TableCell>Query</TableCell>
-              <TableCell>Replied Response</TableCell>
-              <TableCell>Response</TableCell>
-              <TableCell>Comment ID</TableCell>
-              <TableCell>Published Time</TableCell>
-              <TableCell>Updated Time</TableCell>
-              <TableCell>User Name</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {apiData.map((item) => (
-              <TableRow key={item.commentId}>
-                <TableCell>
-                  <Checkbox
-                    checked={item.selected}
-                    onChange={(e) => handleCheckboxChange(e, item.commentId)}
-                  />
-                </TableCell>
-                <TableCell>{item.Answered}</TableCell>
-                <TableCell>{item.Query}</TableCell>
-                <TableCell>{item.Replied_Response}</TableCell>
-                <TableCell>{item.Response}</TableCell>
-                <TableCell>{item.commentId}</TableCell>
-                <TableCell>{item.published_time}</TableCell>
-                <TableCell>{item.updated_time}</TableCell>
-                <TableCell>{item.user_name}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
       </div>
+      
+
+     {
+      apiData.length > 0 && <div
+      style={{
+        marginRight: "100px",
+        marginLeft: "100px",
+        margin: "5px",
+        height: "100x",
+        width: "100%",
+        overflow: "auto",
+        border: "4px solid #000000", // Note: This color value might not be correct, make sure to use the correct color
+      }}
+    >
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Checkbox</TableCell>
+            <TableCell>Answered</TableCell>
+            <TableCell>Query</TableCell>
+            <TableCell>Replied Response</TableCell>
+            <TableCell>Response</TableCell>
+            <TableCell>Comment ID</TableCell>
+            <TableCell>Published Time</TableCell>
+            <TableCell>Updated Time</TableCell>
+            <TableCell>User Name</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {apiData?.map((item:ApiDataItem) => (
+            <TableRow key={item.commentId}>
+              <TableCell>
+                <Checkbox
+                  checked={item.selected}
+                  onChange={(event) => {
+                  const newItem = {
+                    ...item,
+                    selected: event.target.checked
+                  }
+                  // Update state or perform other actions with updatedData
+                  setApiData(prevApiData => prevApiData.map((it) => {
+                    if (it.commentId === newItem.commentId) {
+                      return newItem;
+                    } else {
+                      return it; // Use the previous state it instead of item
+                    }
+                  }));
+                  }}
+                />
+              </TableCell>
+              <TableCell>{item.Answered}</TableCell>
+              <TableCell>{item.Query}</TableCell>
+              <TableCell>{item.Replied_Response}</TableCell>
+              <TableCell>
+                <input type="text" value={item.Response}
+                onChange={(value)=>{
+                  const newItem = {
+                    ...item,
+                    Response: value.target.value,
+                  }
+                  // Update state or perform other actions with updatedData
+                  setApiData(prevApiData => prevApiData.map((it) => {
+                    if (it.commentId === newItem.commentId) {
+                      return newItem;
+                    } else {
+                      return it; // Use the previous state it instead of item
+                    }
+                  }));
+              }}
+
+                
+                
+                />
+
+              </TableCell>
+              <TableCell>{item.commentId}</TableCell>
+              <TableCell>{item.published_time}</TableCell>
+              <TableCell>{item.updated_time}</TableCell>
+              <TableCell>{item.user_name}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <FileModal setIsOpen={setOpenCredentailsFile} IsOpen={openCredentailsFile} apiData={apiData} />
+    </div>
+     }
     </div>
   );
 };
