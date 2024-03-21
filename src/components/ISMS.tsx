@@ -1,7 +1,5 @@
 import api from "@/api";
 import {
-  Button,
-  Input,
   TableBody,
   TableCell,
   TableColumn,
@@ -9,13 +7,12 @@ import {
   TableRow,
   getKeyValue,
 } from "@nextui-org/react";
-import { Tabs, Tab, Chip, Card, CardBody } from "@nextui-org/react";
+import { Tabs, Tab} from "@nextui-org/react";
 
 import React, { useState } from "react";
 import YTSummary from "./ISMS/YTSummary";
-import BarChart from "./ISMS/BarChart";
 import { ChartData } from "chart.js";
-import { Table, Checkbox } from "@nextui-org/react";
+import { Table } from "@nextui-org/react";
 import ClassificationCommentTab from "./ISMS/ClassificationCommentTab";
 import SentimentTab from "./ISMS/SentimentTab";
 import YTURLInput from "./ISMS/YTURLInput";
@@ -415,8 +412,7 @@ function GetYtURLComponent(
   classificationComments: any,
   loadingVideoSummary: any,
   loadingSentimentAnalysis: any,
-  loadingCommentClassifications:any
-
+  loadingCommentClassifications: any
 ) {
   const [ShowPdfs, setShowPdfs] = React.useState(false);
 
@@ -440,27 +436,47 @@ function GetYtURLComponent(
         fullWidth={true}
         aria-label="Options"
       >
-        <Tab key="Summary" title="Summary">
-          {loadingVideoSummary ? "loading" : (
+        <Tab  key="Summary" title="Summary">
+          {loadingVideoSummary ? (
+            "loading"
+          ) : (
             <>{videoSummary && <YTSummary videoSummary={videoSummary} />}</>
           )}
         </Tab>
-        <Tab key="Sentiment" title="Sentiment Analysis">
-          {loadingSentimentAnalysis ? "loading" : (
+        <Tab  isDisabled= {!videoSummary} key="Sentiment" title="Sentiment Analysis">
+          {loadingSentimentAnalysis ? (
+            "loading"
+          ) : (
             <>
-              <SentimentTab
-                chartData={chartData}
-                sentimentComments={sentimentComments}
-              />
+              {chartData && sentimentComments ? (
+                <>
+                  {" "}
+                  <SentimentTab
+                    chartData={chartData}
+                    sentimentComments={sentimentComments}
+                  />
+                </>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <p className="text-red-500 font-semibold text-lg font-sans w-full text-center">
+                    Add YouTube URL
+                  </p>
+                </div>
+              )}
             </>
           )}
         </Tab>
-        <Tab key="Comment" title="Comment classifications">
-          {loadingCommentClassifications ? "loading" : (<><ClassificationCommentTab
-            classificationChartData={classificationChartData}
-            classificationComments={classificationComments}
-          /></>)}
-          
+        <Tab isDisabled={!videoSummary} key="Comment" title="Comment classifications">
+          {loadingCommentClassifications ? (
+            "loading"
+          ) : (
+            <>
+              <ClassificationCommentTab
+                classificationChartData={classificationChartData}
+                classificationComments={classificationComments}
+              />
+            </>
+          )}
         </Tab>
       </Tabs>
       <Button variant="contained" onClick={()=>setShowPdfs(true)} component="label">
