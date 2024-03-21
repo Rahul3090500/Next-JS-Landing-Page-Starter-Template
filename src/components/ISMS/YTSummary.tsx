@@ -1,45 +1,62 @@
-import React from "react";
+import React from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
 
-const YTSummary = ({ videoSummary }: any) => {
+const StyledCard = styled(Card)(() => ({
+  maxWidth: "900",
+  margin: 'auto',
+  marginTop:'60px',
+  transition: '0.3s',
+  boxShadow: '0 8px 40px -12px rgba(0,0,0,0.3)',
+  '&:hover': {
+    boxShadow: '0 16px 70px -12.125px rgba(0,0,0,0.3)',
+  },
+}));
+
+const YTSummary = ({ videoSummary }:any) => {
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-xl transform transition duration-500">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">{videoSummary.video_title}</h2>
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-sm font-medium text-gray-600">
-          by {videoSummary.channel_name}
-        </span>
-        <span className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-          {videoSummary.subsciber_count} subscribers
-        </span>
-      </div>
-      <img
-        src={videoSummary.video_thumbnail}
-        alt="Video Thumbnail"
-        className="w-full h-auto rounded-lg mb-4"
-      />
-      <div className="text-gray-700 space-y-2">
-        <p className="text-sm">
-          Duration: {videoSummary.video_duration}
-        </p>
-        <p className="text-sm">
-          Views: {videoSummary.video_views}
-        </p>
-        <p className="text-sm">
-          Likes: {videoSummary.video_likes}
-        </p>
-        <p className="text-sm">
-          Comments: {videoSummary.total_comments}
-        </p>
-      </div>
-      <a
-        href={videoSummary.video_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block w-full mt-6 text-center bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg transform transition duration-300 hover:scale-105"
-      >
-        Watch Video
-      </a>
-    </div>
+    <Box display="flex" justifyContent="center" alignItems="start" minHeight="100vh">
+      <StyledCard>
+        <CardMedia
+          component="img"
+          height="140"
+          image={videoSummary.video_thumbnail}
+          alt="Video Thumbnail"
+        />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {videoSummary.video_title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            by {videoSummary.channel_name}
+          </Typography>
+          <Chip label={`${videoSummary.subsciber_count} subscribers`} color="primary" variant="outlined" sx={{ my: 1 }}/>
+          <Typography variant="body2" color="text.secondary">
+            Duration: {videoSummary.video_duration}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Views: {videoSummary.video_views}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Likes: {videoSummary.video_likes}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Comments: {videoSummary.total_comments}
+          </Typography>
+          <Box mt={2}>
+            <Button variant="contained" color="primary" fullWidth href={videoSummary.video_url} target="_blank">
+              Watch Video
+            </Button>
+          </Box>
+        </CardContent>
+      </StyledCard>
+    </Box>
   );
 };
 

@@ -1,119 +1,98 @@
-import React, { useState } from "react";
-import axios from "axios";
-import Checkbox from "@mui/material/Checkbox";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import FileInput from "./file";
-import { Button } from "@mui/material";
-import FileModal from "./modal/filemodal";
-import Card from "./modal/card";
-import API from "@/utils/api.config";
-import { useYoutubeContext } from "@/hooks/urlcontext";
+import React, { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Paper,
+  TextField,
+  Box,
+} from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import { styled } from '@mui/material/styles';
+import FileModal from './modal/filemodal';
+import { useYoutubeContext } from '@/hooks/urlcontext';
 
-interface ApiDataItem {
-  Answered: number;
-  Query: string;
-  Replied_Response: number | null; // Assuming the type of Replied_Response is number or null, update as needed
-  Response: string;
-  commentId: string;
-  published_time: string;
-  updated_time: string;
-  user_name: string;
-  selected?: boolean; // Optional property
-}
+const CustomTableCell = styled(TableCell)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  '&:hover': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+}));
+
+const CustomTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+    cursor: 'pointer',
+  },
+  transition: 'background-color 0.3s',
+}));
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+  borderRadius: theme.shape.borderRadius,
+}));
 
 const PdfUploader = () => {
-  const { rowData,setRowData } = useYoutubeContext();
-
-  const [openCredentailsFile, setOpenCredentailsFile] =     useState<Boolean>(false);
+  const { rowData, setRowData } = useYoutubeContext();
+  const [openCredentialsFile, setOpenCredentialsFile] = useState(false);
 
   return (
-    <div>
-      <div className="flex flex-row">
-        <Button
-          variant="contained"
-          onClick={() => setOpenCredentailsFile(true)}
-          component="label"
-        >
-          Submit Response
-        </Button>
-      </div>
+    <Box sx={{ margin: 4 }}>
+   
 
-      {rowData.length > 0 && (
-        <div
-          style={{
-            marginRight: "100px",
-            marginLeft: "100px",
-            margin: "5px",
-            height: "100x",
-            width: "100%",
-            overflow: "auto",
-            border: "4px solid #000000", // Note: This color value might not be correct, make sure to use the correct color
-          }}
-        >
+      {rowData.length > 0 && (<>
+        <StyledTableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Checkbox</TableCell>
-                <TableCell>Answered</TableCell>
-                <TableCell>Query</TableCell>
-                <TableCell>Replied Response</TableCell>
-                <TableCell>Response</TableCell>
-                <TableCell>Comment ID</TableCell>
-                <TableCell>Published Time</TableCell>
-                <TableCell>Updated Time</TableCell>
-                <TableCell>User Name</TableCell>
+              <CustomTableCell>S N0.</CustomTableCell>
+                <CustomTableCell>Checkbox</CustomTableCell>
+                <CustomTableCell>Query</CustomTableCell>
+                <CustomTableCell>Replied Response</CustomTableCell>
+                <CustomTableCell>Response</CustomTableCell>
+                <CustomTableCell>Comment ID</CustomTableCell>
+                <CustomTableCell>Published Time</CustomTableCell>
+                <CustomTableCell>Updated Time</CustomTableCell>
+                <CustomTableCell>User Name</CustomTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rowData?.map((item: ApiDataItem) => (
-                <TableRow key={item.commentId}>
+              {rowData.map((item,index) => (
+                <CustomTableRow key={item.commentId}>
+                                    <TableCell>{index +1}</TableCell>
+
                   <TableCell>
                     <Checkbox
-                      checked={item.selected}
+                      checked={item.selected ?? false}
                       onChange={(event) => {
-                        const newItem = {
-                          ...item,
-                          selected: event.target.checked,
-                        };
-                        // Update state or perform other actions with updatedData
-                        setRowData((prevApiData) =>
-                          prevApiData.map((it) => {
-                            if (it.commentId === newItem.commentId) {
-                              return newItem;
-                            } else {
-                              return it; // Use the previous state it instead of item
-                            }
-                          })
-                        );
+                        const newItem = { ...item, selected: event.target.checked };
+                        setRowData((prev) => prev.map((it) => it.commentId === newItem.commentId ? newItem : it));
                       }}
+                      disabled={item.Answered}
                     />
                   </TableCell>
-                  <TableCell>{item.Answered}</TableCell>
                   <TableCell>{item.Query}</TableCell>
                   <TableCell>{item.Replied_Response}</TableCell>
                   <TableCell>
-                    <input
-                      type="text"
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      size="small"
                       value={item.Response}
-                      onChange={(value) => {
-                        const newItem = {
-                          ...item,
-                          Response: value.target.value,
-                        };
-                        // Update state or perform other actions with updatedData
-                        setRowData((prevApiData) =>
-                          prevApiData.map((it) => {
-                            if (it.commentId === newItem.commentId) {
-                              return newItem;
-                            } else {
-                              return it; // Use the previous state it instead of item
-                            }
-                          })
-                        );
+                      onChange={(event) => {
+                        const newItem = { ...item, Response: event.target.value };
+                        setRowData((prev) => prev.map((it) => it.commentId === newItem.commentId ? newItem : it));
                       }}
                     />
                   </TableCell>
@@ -121,18 +100,27 @@ const PdfUploader = () => {
                   <TableCell>{item.published_time}</TableCell>
                   <TableCell>{item.updated_time}</TableCell>
                   <TableCell>{item.user_name}</TableCell>
-                </TableRow>
+                </CustomTableRow>
               ))}
             </TableBody>
           </Table>
-          <FileModal
-            setIsOpen={setOpenCredentailsFile}
-            IsOpen={openCredentailsFile}
-            
-          />
-        </div>
+        </StyledTableContainer>
+           <Box sx={{ marginTop: 5 }}>
+           <Button
+             variant="contained"
+             color="secondary"
+             onClick={() => setOpenCredentialsFile(true)}
+             component="label"
+   
+           >
+             Submit Response
+           </Button>
+         </Box>
+         </>
       )}
-    </div>
+
+      <FileModal setIsOpen={setOpenCredentialsFile} isOpen={openCredentialsFile} />
+    </Box>
   );
 };
 

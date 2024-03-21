@@ -1,22 +1,64 @@
-import { Input } from '@nextui-org/react';
-import React from 'react';
+import React, { useState } from 'react';
+import { TextField, FormControl, FormHelperText } from '@mui/material';
 
 interface YTURLInputProps {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange:any;
   onClear: () => void;
 }
 
 const YTURLInput: React.FC<YTURLInputProps> = ({ onChange, onClear }) => {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    // Simple YouTube URL validation
+    const isValid = newValue.match(/^(https?:\/\/)?(www\.)?(youtube.com|youtu.be)\/.+$/);
+    setError(!isValid);
+    if (isValid) onChange(event);
+  };
+
+  const handleClear = () => {
+    setValue('');
+    setError(false);
+    onClear();
+  };
+
   return (
-    <Input
-      label="YouTube URL"
-      placeholder="Paste YouTube video URL here"
-      onChange={onChange}
-      onClear={onClear}
-      width="100%"
-      aria-label="YouTube URL"
-      className="w-full p-3 text-base text-gray-700 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
+    <FormControl variant="outlined" fullWidth error={error}>
+      <TextField
+        label="YouTube URL"
+        placeholder="Paste YouTube video URL here"
+        value={value}
+        onChange={handleChange}
+        fullWidth
+        error={error}
+        variant="outlined"
+        InputProps={{
+          endAdornment: value && (
+            <button onClick={handleClear} style={{ cursor: 'pointer', border: 'none', background: 'none', color: 'rgba(0, 0, 0, 0.54)' }}>
+              Clear
+            </button>
+          ),
+        }}
+        // Additional styling for hover effect and shadow
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'rgba(0, 0, 0, 0.23)', // default
+            },
+            '&:hover fieldset': {
+              borderColor: 'primary.main', // hover
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'primary.main', // focused
+            },
+          },
+        }}
+      />
+      {error && <FormHelperText>Please enter a valid YouTube URL.</FormHelperText>}
+    </FormControl>
   );
 };
 
