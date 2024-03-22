@@ -54,7 +54,7 @@ export default function FileInputModal({ IsOpen, setIsOpen }:any) {
       
 
       setRowData([{
-        Answered: 0,
+        Answered: 1,
         Query: "Difference between positive and negative sentiments ?",
         Replied_Response: NaN,
         Response:

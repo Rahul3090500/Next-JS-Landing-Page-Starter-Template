@@ -60,7 +60,6 @@ const PdfUploader = () => {
               <CustomTableCell>S N0.</CustomTableCell>
                 <CustomTableCell>Checkbox</CustomTableCell>
                 <CustomTableCell>Query</CustomTableCell>
-                <CustomTableCell>Replied Response</CustomTableCell>
                 <CustomTableCell>Response</CustomTableCell>
                 <CustomTableCell>Comment ID</CustomTableCell>
                 <CustomTableCell>Published Time</CustomTableCell>
@@ -84,13 +83,13 @@ const PdfUploader = () => {
                     />
                   </TableCell>
                   <TableCell>{item.Query}</TableCell>
-                  <TableCell>{item.Replied_Response}</TableCell>
                   <TableCell>
                     <TextField
                       fullWidth
                       variant="outlined"
                       size="small"
                       value={item.Response}
+                      disabled={item.Answered}
                       onChange={(event) => {
                         const newItem = { ...item, Response: event.target.value };
                         setRowData((prev:any) => prev.map((it:any) => it.commentId === newItem.commentId ? newItem : it));
