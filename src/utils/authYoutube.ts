@@ -1,4 +1,3 @@
-// import { google } from "googleapis";
 
 import API from "./api.config";
 
@@ -16,9 +15,10 @@ const saveJsonToFile = async(data, filename) => {
 };
 
 export const authenticateWithYouTube = async (credentials) => {
+  return credentials
  
 
-  return credentials
+  
 };
 
 export const uploadFileToServer = async (file,youtubeUrl) => {

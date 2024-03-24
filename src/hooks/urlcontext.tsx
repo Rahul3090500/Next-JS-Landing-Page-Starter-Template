@@ -10,6 +10,8 @@ interface YoutubeContextType {
   setTokenFileName: React.Dispatch<React.SetStateAction<string>>;
   rowData: any[]; // Change 'any' to the type of your row data if known
   setRowData: React.Dispatch<React.SetStateAction<any[]>>; // Change 'any' to the type of your row data if known
+  Credentails: Object;
+  setCredentails: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Create the context
@@ -20,7 +22,8 @@ export const YoutubeContextProvider = ({ children }: { children: ReactNode }) =>
   const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/watch?v=f5YdhPYsk3U");
   const [dataFileName, setDataFileName] = useState('');
   const [tokenFileName, setTokenFileName] = useState('');
-  const [rowData, setRowData] = useState<any[]>([]); // Change 'any' to the type of your row data if known
+  const [rowData, setRowData] = useState<any[]>([]);
+  const [Credentails, setCredentails] = useState({}) // Change 'any' to the type of your row data if known
 
   return (
     <YoutubeContext.Provider
@@ -33,6 +36,8 @@ export const YoutubeContextProvider = ({ children }: { children: ReactNode }) =>
         setTokenFileName,
         rowData,
         setRowData,
+        Credentails,
+        setCredentails,
       }}
     >
       {children}

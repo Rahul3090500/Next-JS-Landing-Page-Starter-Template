@@ -4,12 +4,14 @@ import React from 'react';
 interface YTURLInputProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
+  youtubeUrl: string;
 }
 
-const YTURLInput: React.FC<YTURLInputProps> = ({ onChange, onClear }) => {
+const YTURLInput: React.FC<YTURLInputProps> = ({ onChange, onClear,youtubeUrl }) => {
   return (
     <Input
       label="YouTube URL"
+      value={youtubeUrl}
       placeholder="Paste YouTube video URL here"
       onChange={onChange}
       onClear={onClear}
