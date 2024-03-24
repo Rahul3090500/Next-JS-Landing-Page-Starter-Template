@@ -20,7 +20,7 @@ interface HandleCheckboxChangeProps {
 
 const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, setFile: React.Dispatch<React.SetStateAction<File | null>>) => {
   if (event.target.files) {
-    const selectedFile = event.target.files[0];
+    const selectedFile:any = event.target.files[0];
     setFile(selectedFile);
   }
 };

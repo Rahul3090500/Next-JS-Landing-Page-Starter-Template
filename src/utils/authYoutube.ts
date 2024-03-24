@@ -1,18 +1,7 @@
 
 import API from "./api.config";
 
-const saveJsonToFile = async(data, filename) => {
-  const json = JSON.stringify(data);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  window.URL.revokeObjectURL(url);
-  return null
-};
+
 
 export const authenticateWithYouTube = async (credentials) => {
   return credentials
@@ -21,7 +10,7 @@ export const authenticateWithYouTube = async (credentials) => {
   
 };
 
-export const uploadFileToServer = async (file,youtubeUrl) => {
+export const uploadFileToServer = async (file:any,youtubeUrl:any) => {
   const jsonData = JSON.stringify(file);
 
     // Create Blob object from JSON data
@@ -42,15 +31,17 @@ export const uploadFileToServer = async (file,youtubeUrl) => {
         "Content-Type": "multipart/form-data",
       },
     })
-   
+    console.log('response', response)
+
   } catch (error) {
     console.error('Error uploading file:', error);
   }
+
   return null
 };
 
 // Function to handle the authentication response and save it to a JSON file
-export const handleAuthenticationResponse = async(response,youtubeUrl) => {
+export const handleAuthenticationResponse = async(response:any,youtubeUrl:any) => {
   console.log('handleAuthenticationResponse') 
   await uploadFileToServer(response,youtubeUrl);
   

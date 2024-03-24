@@ -1,6 +1,6 @@
 export const AppConfig = {
-  site_name: 'Starter',
-  title: 'Nextjs Starter',
-  description: 'Starter code for your Nextjs Boilerplate with Tailwind CSS',
+  site_name: 'ISMS',
+  title: 'ISMS',
+  description: 'automative youtube replay',
   locale: 'en',
 };

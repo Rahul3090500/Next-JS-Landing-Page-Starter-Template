@@ -15,7 +15,7 @@ import BarChart from "./BarChart";
 
 interface SentimentTabProps {
   chartData: any;
-  sentimentComments: any[];
+  sentimentComments: any;
 }
 
 const SentimentTab: React.FC<SentimentTabProps> = ({
@@ -24,7 +24,7 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
 }) => {
   const [selectedSentiment, setSelectedSentiment] = useState<string>("All");
   // const [currentPage, setCurrentPage] = useState<number>(1);
-  const commentsPerPage = 6;
+  // const commentsPerPage = 6;
 
   const handleSelectionChange = (key: React.Key | null) => {
     if (typeof key === "string") {
@@ -36,7 +36,7 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 6;
   const filteredComments = sentimentComments.filter(
-    (comment) =>
+    (comment:any) =>
       selectedSentiment === "All" || comment.sentiment === selectedSentiment
   );
 
@@ -138,8 +138,8 @@ const SentimentTab: React.FC<SentimentTabProps> = ({
             )}
           </TableHeader>
           <TableBody items={items}>
-            {(item) => (
-              <TableRow key={item.commentId}>
+            {(item:any) => (
+              <TableRow className="singleComment" key={item.commentId}>
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                 )}

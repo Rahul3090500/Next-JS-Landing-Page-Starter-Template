@@ -44,6 +44,7 @@ const ISMS = () => {
         code: query.code,
       });
       const token = response.data.token;
+      console.log(token);
       const payloadForFile = {
         token: token?.access_token,
         refresh_token: token?.refresh_token,

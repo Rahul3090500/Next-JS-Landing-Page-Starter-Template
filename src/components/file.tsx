@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import {
   Modal,
   ModalContent,
@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react";
 import { useYoutubeContext } from "@/hooks/urlcontext";
 import API from "@/utils/api.config";
-export default function FileInputModal({ IsOpen, setIsOpen }) {
+export default function FileInputModal({ IsOpen, setIsOpen }:any) {
   const {setRowData,setDataFileName,youtubeUrl,dataFileName}=useYoutubeContext()
 
   const handleFileChange = async (

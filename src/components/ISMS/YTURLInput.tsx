@@ -1,8 +1,8 @@
-import { Input } from '@nextui-org/react';
-import React from 'react';
+import React, { useState } from 'react';
+import { TextField, FormControl, FormHelperText, Input } from '@mui/material';
 
 interface YTURLInputProps {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange:any;
   onClear: () => void;
   youtubeUrl: string;
 }

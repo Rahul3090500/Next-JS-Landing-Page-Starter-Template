@@ -9,9 +9,16 @@ import {
 } from "@nextui-org/react";
 
 import { useYoutubeContext } from "@/hooks/urlcontext";
+<<<<<<< HEAD
 import axios from "axios";
 export default function FileModal({ IsOpen, setIsOpen }) {
   const { rowData,youtubeUrl,setCredentails,Credentails} = useYoutubeContext();
+=======
+
+export default function FileModal({ IsOpen, setIsOpen }:any) {
+  const { rowData,youtubeUrl} = useYoutubeContext();
+  const [authData, setAuthData] = useState(null);
+>>>>>>> 19c6dcb5cf230433836a4bf572d4b34521ebe37e
 
  
   useEffect(() => {
@@ -56,11 +63,11 @@ export default function FileModal({ IsOpen, setIsOpen }) {
     auth();
   }, [Credentails]);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = (event:any) => {
     const file = event.target.files[0];
     const reader = new FileReader();
 
-    reader.onload = (event) => {
+    reader.onload = (event:any) => {
       try {
         const jsonData = JSON.parse(event.target.result);
         console.log(jsonData);

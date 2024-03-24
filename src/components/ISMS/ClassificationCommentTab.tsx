@@ -4,12 +4,12 @@ import BarChart from "./BarChart";
 
 interface CommentTabProps {
   classificationChartData: any;
-  classificationComments: any[];
+  classifiactionComments: any;
 }
 
 const ClassificationCommentTab: React.FC<CommentTabProps> = ({
   classificationChartData,
-  classificationComments = [],
+  classifiactionComments = [],
 }) => {
   const [selectedSentenceType, setSelectedSentenceType] = useState<
     string | number
@@ -24,7 +24,7 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
     }
   };
 
-  const filteredComments = classificationComments.filter((comment) => {
+  const filteredComments = classifiactionComments.filter((comment:any) => {
     return (
       selectedSentenceType === "All" ||
       comment.sentence_type === selectedSentenceType
@@ -103,8 +103,8 @@ const ClassificationCommentTab: React.FC<CommentTabProps> = ({
             )}
           </TableHeader>
           <TableBody items={items}>
-            {(item) => (
-              <TableRow key={item.commentId}>
+            {(item:any) => (
+              <TableRow  className="singleComment" key={item.commentId}>
                 {(columnKey) => (
                   <TableCell>{getKeyValue(item, columnKey)}</TableCell>
                 )}
