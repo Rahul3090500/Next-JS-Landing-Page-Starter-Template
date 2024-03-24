@@ -16,25 +16,19 @@ export default function FileInputModal({ IsOpen, setIsOpen }:any) {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     e.preventDefault();
-    setDataFileName(e.target.files[0]?.name);
+   
     const file = e.target.files[0];
 
     const formData = new FormData();
     formData.append('filename', file);
 
     try {
-        const response = await fetch('http://20.244.47.51:8080/v1/upload_file?url=https://www.youtube.com/watch?v=f5YdhPYsk3U' , {
+        const response = await fetch(`http://20.244.47.51:8080/v1/upload_file?url=${youtubeUrl}` , {
             method: 'POST',
             body: formData
         });
 
-        if (response.ok) {
-            console.log('File uploaded successfully');
-            // Handle success
-        } else {
-            console.error('File upload failed');
-            // Handle failure
-        }
+       setDataFileName(file?.name)
     } catch (error) {
         console.error('Error uploading file:', error);
         // Handle error

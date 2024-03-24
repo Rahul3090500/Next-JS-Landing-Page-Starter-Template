@@ -9,16 +9,9 @@ import {
 } from "@nextui-org/react";
 
 import { useYoutubeContext } from "@/hooks/urlcontext";
-<<<<<<< HEAD
 import axios from "axios";
-export default function FileModal({ IsOpen, setIsOpen }) {
+export default function FileModal({ isOpen, setIsOpen }) {
   const { rowData,youtubeUrl,setCredentails,Credentails} = useYoutubeContext();
-=======
-
-export default function FileModal({ IsOpen, setIsOpen }:any) {
-  const { rowData,youtubeUrl} = useYoutubeContext();
-  const [authData, setAuthData] = useState(null);
->>>>>>> 19c6dcb5cf230433836a4bf572d4b34521ebe37e
 
  
   useEffect(() => {
@@ -83,7 +76,7 @@ export default function FileModal({ IsOpen, setIsOpen }:any) {
 
   return (
     <>
-      <Modal isOpen={IsOpen}>
+      <Modal isOpen={isOpen}>
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
